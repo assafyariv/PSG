@@ -1,0 +1,96 @@
+// Copyright NVIDIA Corporation 2010
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+// needs to have matrices.cg included beforehand
+
+float4   projectionSizeVector
+<
+  bool UIVisible = false;
+> = {1,1,1,2};
+
+float    tessellationAccuracy
+<
+  string UIWidget = "Slider";
+  float UIMin = 1.0;
+  float UIMax = 100.0;
+  float UIStep = 1.0;
+> = 60.0f;
+
+float adjustRadius( float3 bbCenter, float3 p, float bbRadius )
+{
+  float3 v = p - bbCenter;
+  float d = dot( v, v );
+  if ( bbRadius < d )
+  {
+    bbRadius = d;
+  }
+  return( bbRadius );
+}
+
+float tessFactor( float3 bbCenter, float bbRadius )
+{
+  return( max( 2, abs( sqrt( bbRadius ) / dot( mul( World, float4( bbCenter, 1.0f ) ), projectionSizeVector ) ) / tessellationAccuracy ) );
+}
+
+float calculateTessFactor( AttribArray<float3> position )
+{
+  float3 bbMin = position[0];
+  float3 bbMax = position[0];
+  for ( int i=1 ; i<position.length ; i++ )
+  {
+    bbMin = min( bbMin, position[i] );
+    bbMax = max( bbMax, position[i] );
+  }
+  float3 bbCenter = 0.5f * ( bbMin + bbMax );
+  float bbRadius = 0.0f;
+  for ( int i=0 ; i<position.length ; i++ )
+  {
+    bbRadius = adjustRadius( bbCenter, position[i], bbRadius );
+  }
+  return( tessFactor( bbCenter, bbRadius ) );
+}
+
+float calculateTessFactor( float3 position[16] )
+{
+  float3 bbMin = position[0];
+  float3 bbMax = position[0];
+  for ( int i=1 ; i<16 ; i++ )
+  {
+    bbMin = min( bbMin, position[i] );
+    bbMax = max( bbMax, position[i] );
+  }
+  float3 bbCenter = 0.5f * ( bbMin + bbMax );
+  float bbRadius = 0.0f;
+  for ( int i=0 ; i<16 ; i++ )
+  {
+    bbRadius = adjustRadius( bbCenter, position[i], bbRadius );
+  }
+  return( tessFactor( bbCenter, bbRadius ) );
+}
+
+float calculateTessFactor( float3 p0, float3 p1, float3 p2, float3 p3 )
+{
+  float3 bbMin0 = min( p0, p1 );
+  float3 bbMin1 = min( p2, p3 );
+  float3 bbMin = min( bbMin0, bbMin1 );
+  float3 bbMax0 = max( p0, p1 );
+  float3 bbMax1 = max( p2, p3 );
+  float3 bbMax = max( bbMax0, bbMax1 );
+  
+  float3 bbCenter = 0.5f * ( bbMin + bbMax );
+  float bbRadius = 0.0f;
+  bbRadius = adjustRadius( bbCenter, p0, bbRadius );
+  bbRadius = adjustRadius( bbCenter, p1, bbRadius );
+  bbRadius = adjustRadius( bbCenter, p2, bbRadius );
+  bbRadius = adjustRadius( bbCenter, p3, bbRadius );
+  
+  return( tessFactor( bbCenter, bbRadius ) );
+}

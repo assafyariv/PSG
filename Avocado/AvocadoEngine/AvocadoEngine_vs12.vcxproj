@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D263B266-82B5-48AD-8C2C-A79647A1841B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AvocadoEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <EmbedManifest>false</EmbedManifest>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_AVENG;AVOCADOENGINE_EXPORTS;_D_NVSG_DGB_LEAK_DETECTION;_AVOCADO_DISABLE_TRACING;_AVOCADO_WIN8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\SceniX\inc\nvrt\nvirt;..\..\SceniX\inc\nvrt;..\..\SceniX\inc\nvsg\nvtraverser;..\..\SceniX\inc\nvsg\nvui;..\..\Scenix\inc\;..\..\SceniX\inc\nvsg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;opengl32.lib;wininet.lib;..\..\Scenix\lib\x86\win\crt100\debug\Scenix9.lib;..\..\Scenix\lib\x86\win\crt100\debug\SceniXRT9.lib;..\..\Scenix\lib\x86\win\crt100\debug\cg.lib;..\..\Scenix\lib\x86\win\crt100\debug\cgGL.lib;..\..\3rdParty\jpeg-8d\JpegLibWin\Debug\JpegLibWin_vs12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TargetMachine>MachineX86</TargetMachine>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_AVENG;_AVENG64;AVOCADOENGINE_EXPORTS;D_NVSG_DGB_LEAK_DETECTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\SceniX\inc\nvrt\nvirt;,,\..\SceniX\inc\nvrt;..\..\SceniX\inc\nvsg\nvtraverser;..\..\SceniX\inc\nvsg\nvui;..\..\Scenix\inc\;..\..\SceniX\inc\nvsg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;opengl32.lib;wininet.lib;..\..\Scenix\lib\amd64\win\crt100\debug\Scenix9.lib;..\..\Scenix\lib\amd64\win\crt100\debug\SceniXRT9.lib;..\..\SceniX\lib\amd64\win\crt100\debug\cg.lib;..\..\Scenix\lib\amd64\win\crt100\debug\cgGL.lib;..\..\3rdParty\jpeg-8d\JpegLibWin\x64\Debug\JpegLibWin.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_AVENG;AVOCADOENGINE_EXPORTS;VOCADO_DISABLE_TRACING;_AVOCADO_WIN8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\SceniX\inc\nvrt\nvirt;..\..\SceniX\inc\nvsg\nvtraverser;..\..\SceniX\inc\nvrt;..\..\SceniX\inc\nvsg;..\..\SceniX\inc\nvsg\nvui;..\..\SceniX\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>
+      </OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;opengl32.lib;wininet.lib;..\..\Scenix\lib\x86\win\crt100\release\Scenix9.lib;..\..\Scenix\lib\x86\win\crt100\release\SceniXRT9.lib;..\..\Scenix\lib\x86\win\crt100\release\cg.lib;..\..\Scenix\lib\x86\win\crt100\release\cgGL.lib;..\..\3rdParty\jpeg-8d\JpegLibWin\Release\JpegLibWin_vs12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TargetMachine>MachineX86</TargetMachine>
+      <NoEntryPoint>
+      </NoEntryPoint>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_AVENG;AVOCADOENGINE_EXPORTS;_AVENG64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\SceniX\inc\nvrt\nvirt;..\..\SceniX\inc\nvsg\nvtraverser;..\..\SceniX\inc\nvrt;..\..\SceniX\inc\nvsg;..\..\SceniX\inc\nvsg\nvui;..\..\SceniX\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <EnablePREfast>true</EnablePREfast>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;opengl32.lib;wininet.lib;..\..\Scenix\lib\amd64\win\crt100\release\Scenix9.lib;..\..\Scenix\lib\amd64\win\crt100\release\SceniXRT9.lib;..\..\Scenix\lib\amd64\win\crt100\release\cg.lib;..\..\Scenix\lib\amd64\win\crt100\release\cgGL.lib;..\..\3rdParty\jpeg-8d\JpegLibWin\x64\Release\JpegLibWin.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AnimationManipulator.cpp" />
+    <ClCompile Include="AvocadoAnimationManipulatorModule.cpp" />
+    <ClCompile Include="AvocadoAnnotationsModule.cpp" />
+    <ClCompile Include="AvocadoAppInterface.cpp" />
+    <ClCompile Include="AvocadoDraggerModule.cpp" />
+    <ClCompile Include="AvocadoEngine.cpp" />
+    <ClCompile Include="AvocadoEngineDoc.cpp" />
+    <ClCompile Include="AvocadoEngineOptions.cpp" />
+    <ClCompile Include="AvocadoMaterials.cpp" />
+    <ClCompile Include="AvocadoNetworkModule.cpp" />
+    <ClCompile Include="AvocadoEngineObject.cpp" />
+    <ClCompile Include="AvocadoEngineView.cpp" />
+    <ClCompile Include="AvocadoImportModule.cpp" />
+    <ClCompile Include="AvocadoManipulator.cpp" />
+    <ClCompile Include="AvocadoManipulatorModule.cpp" />
+    <ClCompile Include="AvocadoMessageHandler.cpp" />
+    <ClCompile Include="AvocadoParams.cpp" />
+    <ClCompile Include="AvocadoPickerModule.cpp" />
+    <ClCompile Include="AvocadoPipeline.cpp" />
+    <ClCompile Include="AvocadoPipelineModule.cpp" />
+    <ClCompile Include="AvocadoScenixAdapter.cpp" />
+    <ClCompile Include="AvocadoSelectionModule.cpp" />
+    <ClCompile Include="AvocadoSOAPClient.cpp" />
+    <ClCompile Include="CameraAnimator.cpp" />
+    <ClCompile Include="FFPToCgFxTraverser.cpp" />
+    <ClCompile Include="Manipulator.cpp" />
+    <ClCompile Include="MeshGenerator.cpp" />
+    <ClCompile Include="SceneFunctions.cpp" />
+    <ClCompile Include="unzip.cpp" />
+    <ClCompile Include="zip.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AnimationManipulator.h" />
+    <ClInclude Include="AvocadoAnimationManipulatorModule.h" />
+    <ClInclude Include="AvocadoAnnotationsModule.h" />
+    <ClInclude Include="AvocadoAppInterface.h" />
+    <ClInclude Include="AvocadoDraggerModule.h" />
+    <ClInclude Include="AvocadoEngine.h" />
+    <ClInclude Include="AvocadoEngineDoc.h" />
+    <ClInclude Include="AvocadoAppOptionsInterface.h" />
+    <ClInclude Include="AvocadoInternalModules.h" />
+    <ClInclude Include="AvocadoMaterials.h" />
+    <ClInclude Include="AvocadoNetworkModule.h" />
+    <ClInclude Include="AvocadoEngineObject.h" />
+    <ClInclude Include="AvocadoEngineView.h" />
+    <ClInclude Include="AvocadoImportModule.h" />
+    <ClInclude Include="AvocadoManipulator.h" />
+    <ClInclude Include="AvocadoManipulatorModule.h" />
+    <ClInclude Include="AvocadoMessageHandler.h" />
+    <ClInclude Include="AvocadoModuleInterface.h" />
+    <ClInclude Include="AvocadoParams.h" />
+    <ClInclude Include="AvocadoPickerModule.h" />
+    <ClInclude Include="AvocadoPipeline.h" />
+    <ClInclude Include="AvocadoPipelineModule.h" />
+    <ClInclude Include="AvocadoScenixAdapter.h" />
+    <ClInclude Include="AvocadoSelectionModule.h" />
+    <ClInclude Include="AvocadoSOAPClient.h" />
+    <ClInclude Include="CameraAnimator.h" />
+    <ClInclude Include="FFPToCgFxTraverser.h" />
+    <ClInclude Include="Manipulator.h" />
+    <ClInclude Include="MeshGenerator.h" />
+    <ClInclude Include="SceneFunctions.h" />
+    <ClInclude Include="unzip.h" />
+    <ClInclude Include="zip.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

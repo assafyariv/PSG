@@ -1,0 +1,69 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Products</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.productName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productName)
+            @Html.ValidationMessageFor(model => model.productName)
+        </div>
+
+            <div class="editor-label">
+            @Html.LabelFor(model => model.productVersion)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productVersion)
+            @Html.ValidationMessageFor(model => model.productVersion)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.description)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.description, new { @class = "whatever-class", @cols = 36, @rows = 5 })
+            @Html.ValidationMessageFor(model => model.description)
+        </div>
+         @{var states = new SelectList((System.Collections.IEnumerable)ViewBag.ro, "roomId", "name");
+}
+       
+         <div class="editor-label">
+            @Html.LabelFor(model => model.roomID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.roomID, states, new { style = "width:160px;" })   
+                @{ //new { @Value = 0 }))  new { style = "width: 500px;" })
+}
+            @Html.ValidationMessageFor(model => model.roomID)
+        </div>
+
+
+         <input type="file" name="file" id="file" /> 
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Plist")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AvocadoBugs>
+  <AvocadoBugs2_October10>
+    <bug id ="1" priority ="H" difficulty ="L">Fit room texture to optix</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Shaders on intel card</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Animation rotation center</bug>
+    <bug id ="1" priority ="H" difficulty ="L">spot lights selection and direct lights gallery.</bug>
+    
+    <bug id ="1" priority ="H" difficulty ="L">Texture gallery corruption- Import file, Add new texture to gallery, assign to part, switch ribbon tabs</bug>
+    <bug id ="1" priority ="H" difficulty ="L">room gallery previews interactive with com.</bug>
+    <bug id ="1" priority ="H" difficulty ="L">room gallery.</bug>
+    
+    <bug id ="1" priority ="H" difficulty ="L">20 material presets.</bug>
+    
+    <bug id ="1" priority ="H" difficulty ="L">Add2Group rotation center</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Animation rotation center</bug>
+    
+    <bug id ="1" priority ="H" difficulty ="L">OLE Automation server and trail play</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Seciton cut feature</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Copy/Paste/Cut. Embedded files, and improve linking , avc file inside avc file</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Area selection</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Concurent Editing</bug>
+    <bug id ="1" priority ="H" difficulty ="L">In place toobars</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Text and callouts</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Langauge resource files.</bug>
+    <bug id ="1" priority ="H" difficulty ="L">Cleanup IDs</bug>
+  </AvocadoBugs2_October10>
+  <bug id ="FIXED" priority ="H" difficulty ="L">save elements possition with viewstate - simple animation</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">performance optimizations</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">model onload /on save optimizations</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">rotation center of navigatopn,spin center of child</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">fix dragger allignemnt</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">texture , bumps</bug>
+<bug id ="FIXED?" priority ="H" difficulty ="L">basic animation recording</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">optix improvements - cook scene/ camera lens props</bug>
+<bug id ="PARTIALLYFIXED" priority ="H" difficulty ="L">orthographic camera , camera FOV , depthOfView.. </bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">basic annotaions -spot lights, basic shape, section </bug>
+<bug id ="PARTIALLYFIXED" priority ="H" difficulty ="L">wireframe,toon</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">re-visit material preset</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">lights customize</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">Proper Error handling , tracing and logging </bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">Progress bar</bug>
+<bug id ="PARTIALLYFIXED" priority ="H" difficulty ="L">Impement in place frame</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">Impement grouping and multi-select</bug>
+<bug id ="FIXED" priority ="H" difficulty ="L">OLE Embed save</bug> 
+<bug id ="1" priority ="H" difficulty ="L">Onclick animation / scripts </bug>
+<bug id ="1" priority ="H" difficulty ="L">Print preview thumbnail size and colors</bug>
+<bug id ="1" priority ="H" difficulty ="L">OLE Embedding OnDraw size and colors</bug>
+<bug id ="1" priority ="H" difficulty ="L">Export to TIFF</bug>
+<bug id ="1" priority ="H" difficulty ="L">Export yo PNG</bug>
+<bug id ="1" priority ="H" difficulty ="L">Enable / disable button command based on second selection</bug>
+<bug id ="1" priority ="H" difficulty ="L">display filters </bug>
+<bug id ="1" priority ="H" difficulty ="L">selection filters (group selection)</bug>
+<bug id ="1" priority ="H" difficulty ="L">show spin center / grid</bug>
+<bug id ="1" priority ="H" difficulty ="L">pre-selection tooltips</bug>
+<bug id ="1" priority ="H" difficulty ="L"> background image - rener and save to file</bug>
+<bug id ="1" priority ="H" difficulty ="L"> environemtn/room - rener and save to file</bug>
+<bug id ="1" priority ="H" difficulty ="L">html backgound image parsing?</bug>
+<bug id ="1" priority ="H" difficulty ="L">viewstate navigation gallery</bug>
+<bug id ="1" priority ="H" difficulty ="L">boost html editor</bug>
+<bug id ="1" priority ="H" difficulty ="L">boost file view</bug>
+<bug id ="1" priority ="H" difficulty ="L">html parsing if img src is also href</bug>
+<bug id ="1" priority ="H" difficulty ="L">re-visit light presets</bug>
+<bug id ="1" priority ="H" difficulty ="L">Orientation bug</bug>
+<bug id ="1" priority ="H" difficulty ="L">link with sources update/check/..</bug>
+<bug id ="1" priority ="H" difficulty ="L">Fix multi frame/view bugs.</bug>
+<bug id ="1" priority ="H" difficulty ="L">Impement Copy Paste</bug>
+<bug id ="1" priority ="H" difficulty ="L">Match to heirSvr example</bug>
+<bug id ="1" priority ="H" difficulty ="L">3D sterero</bug>
+<bug id ="1" priority ="H" difficulty ="L">AA checkbox</bug>
+<bug id ="1" priority ="H" difficulty ="L">Options dialog</bug>
+<bug id ="1" priority ="H" difficulty ="L">Upload and download</bug>
+<bug id ="1" priority ="H" difficulty ="L">String infrastructure</bug>
+<bug id ="1" priority ="H" difficulty ="L">Implement automation server (IAvocado)</bug>
+<bug id ="1" priority ="H" difficulty ="L">Locatlization</bug>
+<bug id ="1" priority ="H" difficulty ="L">Licence</bug>
+<bug id ="1" priority ="H" difficulty ="L">Basic server list.</bug>
+<bug id ="1" priority ="H" difficulty ="L">Download to current session ?</bug>
+<bug id ="1" priority ="H" difficulty ="L">Upload from session</bug>
+<bug id ="1" priority ="H" difficulty ="L">Installer</bug>
+<bug id ="1" priority ="H" difficulty ="L">Audio/Video inside html</bug>
+<bug id ="1" priority ="H" difficulty ="L">Export to avi</bug>
+<bug id ="1" priority ="H" difficulty ="L">Export to PowerPoint/Publisher/Word</bug>
+<bug id ="1" priority ="H" difficulty ="L">Open in internet explorer</bug>
+<bug id ="1" priority ="H" difficulty ="L">Support multi-lang htmls in site AND/OR application</bug>
+<bug id ="1" priority ="H" difficulty ="L">Multi-level website - duplicate current site as template</bug>
+<bug id ="1" priority ="H" difficulty ="L">Measurments and global units</bug>
+<bug id ="1" priority ="H" difficulty ="L">DotNet/PowerPoint apps</bug>
+<bug id ="1" priority ="H" difficulty ="L">Finish platform ui and module load/config</bug>
+<bug id ="1" priority ="H" difficulty ="L">Create basic unit testing and QA infrastructure </bug>
+<bug id ="1" priority ="H" difficulty ="L">OLE Automation - convert/export import..render</bug>
+<bug id ="1" priority ="H" difficulty ="L">send email button</bug>
+<bug id ="1" priority ="H" difficulty ="L">remove update button</bug>
+<bug id ="1" priority ="H" difficulty ="L">Documentation,Help,Icons</bug>
+</AvocadoBugs>
+
+
+

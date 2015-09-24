@@ -1,0 +1,101 @@
+// Copyright NVIDIA Corporation 2002-2007
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+#include "include/NVSGLight.cg"
+
+float coneDelta = 15.0;
+
+float spoteffect(NVSGLight light, float3 position)
+{
+	float spot = 1.0;
+	if ( light.spotCutoff <= 90.0 )
+	{
+		float3 V = normalize(position - light.position.xyz);
+		float cosInnerCone = cos(3.14159 * max(light.spotCutoff , 0.0) / 180.0);
+		float cosOuterCone = cos(3.14159 * min(light.spotCutoff+coneDelta, 90.0) / 180.0);
+		float cosDir = max(dot(V, normalize(light.direction.xyz)), 0);
+		if ( cosDir < cosOuterCone )
+		{   
+			// outside outer cone
+			spot = 0.0;
+		}
+		else
+		{
+			if ( cosDir >= cosInnerCone )
+			{  
+			    // inside inner cone
+				spot = 1.0;
+		    }
+			else
+			{
+			    // in between inner and outer cone - 
+			    // fall off by terms of a smooth Hermite interpolation
+				spot = -2 * pow((cosDir - cosOuterCone)/(cosInnerCone - cosOuterCone), 3)
+				     + 3 * pow((cosDir - cosOuterCone)/(cosInnerCone - cosOuterCone), 2);
+				spot = pow(spot, light.spotExponent);     
+			}
+		}
+	}
+    return spot;
+}
+
+float attenuation(NVSGLight light, float3 position)
+{
+	float d = distance(position, light.position.xyz);
+	return 1 / ( light.constantAttenuation
+	           + light.linearAttenuation * d
+	           + light.quadraticAttenuation * d * d ); 
+}
+ 
+void lighting( NVSGLight light
+             , float3 position
+             , float3 normal
+             , float3 viewVector
+             , float shininess
+             , out float3 ambient
+             , out float3 diffuse
+             , out float3 specular
+             )
+{
+  // attenuation factor
+  float afactor = attenuation(light, position);
+    
+  float spot = spoteffect(light, position);
+	
+	// ambient term
+	ambient = light.ambient.xyz * afactor * spot;
+	
+	// diffuse term
+	float3 L;
+	if ( light.position.w == 0.0f )
+	{ 
+	  // directed light
+		L = normalize(light.position).xyz;
+	}
+	else
+	{ 
+	  // point light
+		L = normalize(light.position.xyz - position);
+	}
+	float dfactor = max(dot(normal,L), 0);
+	diffuse = light.diffuse.xyz * dfactor * afactor * spot;
+	
+	// specular term
+	float3 H = normalize(L+viewVector);
+	float sfactor = pow(max(dot(normal,H),0), shininess);
+	if (dfactor <= 0) 
+	{
+	  sfactor = 0.0f;
+	}
+	
+	specular = light.specular.xyz * sfactor * afactor * spot;
+}
+

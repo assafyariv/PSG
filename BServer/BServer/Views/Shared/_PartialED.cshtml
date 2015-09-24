@@ -1,0 +1,16 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@if (Request.IsAuthenticated) {
+    <ul>
+        <li> @Html.ActionLink("Rooms", "Index", "Room")</li>
+       <li> @Html.ActionLink("Settings", "background","Home") </li>
+        <li>@Html.ActionLink("Products", "Plist", "Products")</li>
+     </ul>
+} else {
+    <ul>
+         <li>@Html.ActionLink("Home", "Index", "Home")</li>
+         <li>@Html.ActionLink("About", "About", "Home")</li>
+         <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+         <li>@Html.ActionLink("Products", "Index", "Products")</li>
+    </ul>
+}

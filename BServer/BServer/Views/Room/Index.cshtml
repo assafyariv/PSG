@@ -1,0 +1,53 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model IEnumerable<BServer.Models.room>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class  = "altrowstable">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.location)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.typ)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.scale)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.location)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.typ)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.scale)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.roomId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.roomId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.roomId })
+        </td>
+    </tr>
+}
+
+</table>

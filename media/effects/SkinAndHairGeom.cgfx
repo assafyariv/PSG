@@ -1,0 +1,460 @@
+#include "include/NVSGLight.cg"
+#include "include/NVSGMaterial.cg"
+
+float4x4 mWvp : WorldViewProjection;
+float4x4 mWv : WorldView;
+float4x4 mWvIT : WorldInverseTranspose;
+float4x4 mW : World;
+float4x4 mWI : WorldInverse;
+float4x4 mVIT : ViewIT;
+
+float shininess <float uimin = 0; float uimax = 100;> = 12;
+
+float furLength <float uimin = .01; float uimax = 1;> = 1.0;
+float stiffness <float uimin = 0; float uimax = 1;> = .5;
+float3 gravity = float3(0, -9.8, 0);
+//Mass of an individual hair in grams
+float hairMass <float uimin = .01; float uimax = 1;> = 0.1;
+
+const static float CONV_g_TO_kg = 1.0 / 1000;
+
+texture texFurColor  <
+    string TextureType = "2D";
+>;
+float4 diffuseMapPosition = {1.0,1.0,0.0,0.0} ;
+sampler2D diffuseMapSampler = sampler_state
+{
+    Texture = <texFurColor>;
+    minFilter = Linear;
+    magFilter = Linear;
+    WrapS = Repeat;
+    WrapT = Repeat;
+};
+
+NVSGLight light[];
+NVSGMaterial material;
+//-----------------------
+
+struct AppToVert
+{
+    float3 position : POSITION;
+    float3 normal : NORMAL;
+    float2 texCoord : TEXCOORD0;
+};
+
+struct VertToFragSkin
+{
+    float4 posProj : POSITION;
+    float4 position : TEXCOORD5;
+    float3 normal : TEXCOORD6;
+    float2 texCoord : TEXCOORD0;
+    float3 texCoord1 : TEXCOORD1;
+};
+
+struct VertToGeom
+{
+    float3 position : POSITION;
+    float3 normal : TEXCOORD6;
+    float2 texCoord : TEXCOORD0;
+    float3 texCoord1 : TEXCOORD1;
+};
+
+struct GeomToFrag
+{
+    float4 posProj : POSITION;
+    float4 position : TEXCOORD5;
+    float3 normal : TEXCOORD6;
+    float4 color : TEXCOORD0;
+    float3 texCoord1 : TEXCOORD1;
+};
+
+struct FragToOut
+{
+    float4 color : COLOR;
+};
+
+//-----------------------
+
+float fresnel( float3 i, float3 n, float eta, out float3 r, out float3 t )
+{
+	float result;
+	float c1;
+	float cs2;
+	float tflag;
+	c1 = dot(-i,n);
+	cs2 = 1.0-eta*eta*(1.0-c1*c1);
+	tflag = (float) (cs2 >= 0.0);
+	t = tflag * (((eta*c1-sqrt(cs2))*n) + eta*i);
+	// t is already unit length or (0,0,0)
+	// Compute Fresnel terms
+	// (From Global Illumination Compendeum.)
+	float ndott;
+	float cosr_div_cosi;
+	float cosi_div_cosr;
+	float fs;
+	float fp;
+	float kr;
+	ndott = dot(-n,t);
+	cosr_div_cosi = ndott / c1;
+	cosi_div_cosr = c1 / ndott;
+	fs = (cosr_div_cosi - eta) / (cosr_div_cosi + eta);
+	fs = fs * fs;
+	fp = (cosi_div_cosr - eta) / (cosi_div_cosr + eta);
+	fp = fp * fp;
+	kr = 0.5 * (fs+fp);
+	result = tflag*kr + (1.-tflag);
+	r = reflect( i, n );
+	return result;
+}
+float3 hgphase( float3 v1, float3 v2, float3 g )
+{
+	float costheta;
+	float3 g2;
+	float3 gtemp;
+	costheta = dot( -v1, v2 );
+	g2 = g*g;
+	gtemp = 1.0.xxx + g2 - 2.0*g*costheta;
+	gtemp = pow( gtemp, 1.5.xxx );
+	gtemp = (1.0.xxx - g2) / gtemp;
+	return gtemp;
+}
+
+float3 singleScatter( float3 wi, float3 wo, float3 n, float3 g,float3 albedo, float thickness )
+{
+	float win = abs(dot(wi,n));
+	float won = abs(dot(wo,n));
+	float eterm;
+	float3 result;
+	eterm = 1.0 - exp( (-((1./win)+(1./won))*thickness) );
+	result = eterm * (albedo * hgphase( wo, wi, g ) / (win + won));
+	return result;
+}
+
+//-----------------------
+VertToFragSkin vertexSkinMain2(AppToVert IN)
+{
+    VertToFragSkin OUT;
+    OUT.posProj = mul(mWvp, float4(IN.position, 1));
+    OUT.position = float4(IN.position, 1);
+    OUT.texCoord = float2(IN.texCoord.x * diffuseMapPosition.x,IN.texCoord.y * diffuseMapPosition.y);
+    OUT.normal = IN.normal;
+    return OUT;
+}
+
+FragToOut fragmentSkinMain2(VertToFragSkin IN, uniform NVSGMaterial material)
+{
+    FragToOut OUT;
+    
+    float3 viewerPos = float3(0, 0, 0);
+    float3 lightPos = float3(2, 2, 0);
+    if (light.length > 0)
+	lightPos =  light[0].position.xyz;
+    float3 surfPos = mul(mWv, IN.position).xyz;
+    float3 viewerDir = normalize(viewerPos - surfPos);
+    float3 lightDir = normalize(lightPos - surfPos);
+    
+    float3 surfNorm = mul(mWv, float4(IN.normal, 0)).xyz;
+    float3 halfDir = normalize(lightDir + viewerDir);
+
+    float lumDiff = saturate(dot(surfNorm, lightDir));
+    float lumSpec = pow(saturate(dot(surfNorm, halfDir)), material.shininess);
+
+
+		float3 T, T2;
+		float3 R, R2;
+		// Compute fresnel at sheen layer and then ramp it up a bit.
+		float Kr = fresnel( -viewerDir, surfNorm, 1.0/1.4, R, T );
+
+		Kr = smoothstep( 0.0, 0.5, Kr );
+		float Kt = 1.0 - Kr;
+		// Compute the refracted light ray and the refraction
+		// coefficient.
+		float Kr2 = fresnel( -lightDir, surfNorm, 1.0/1.4, R2, T2 );
+		Kr2 = smoothstep( 0.0, 0.5, Kr2 );
+		float Kt2 = 1.0 - Kr2;
+
+		// do sheen..
+		float4 sheenColor = material.specular;
+
+		float3 Hn = halfDir;
+
+		float4 sheen = 2.5 * Kr * sheenColor *( abs(dot(surfNorm,lightDir)) * (0.2 + pow(abs(dot(surfNorm,Hn)) , 34.0 )) );
+
+		// scratter
+		float4 skinColor = material.diffuse;//float4( 0.8, 0.7, 0.5,1 ) + float4(0.1,0.1,0.1,1.0);
+	
+		float3 ggr = float3( 0.8, 0.3, 0.0 );
+		float3 albedo = float3( 0.8, 0.5, 0.4 );
+		float3 temp = singleScatter( T2, T, surfNorm, ggr, albedo, 0.5);
+
+		float4 subsurf = 2.5 * skinColor * abs(dot(surfNorm,lightDir)) * Kt * Kt2 *(temp.x+temp.y+temp.z);
+
+
+    float4 color = tex2D(diffuseMapSampler  , IN.texCoord) ;//* (lumDiff + lumSpec); ;
+    OUT.color = color + float4(sheen.xyz,1) + float4(subsurf.xyz,1)  ;
+    return OUT;
+}
+
+VertToFragSkin vertexSkinMain(AppToVert IN)
+{
+    VertToFragSkin OUT;
+    OUT.posProj = mul(mWvp, float4(IN.position, 1));
+    float4 worldPos =  mul(mW,float4(IN.position, 1));
+    OUT.position =  float4(IN.position, 1);
+    float4 eyeVector = worldPos - mVIT[3];
+    OUT.texCoord =  float2(IN.texCoord.x * diffuseMapPosition.x,IN.texCoord.y * diffuseMapPosition.y);
+
+    OUT.texCoord1 = eyeVector.xyz;
+    OUT.normal = IN.normal;
+    return OUT;
+}
+
+FragToOut fragmentSkinMain(VertToFragSkin IN, uniform NVSGMaterial material)
+{
+    FragToOut OUT;
+    float3 eyeVec = IN.texCoord1.xyz;
+    float3 viewerDir = -normalize(eyeVec);
+float lumDiff = 0;
+float lumSpec = 0;
+float4 subsurf = 0;
+float4 sheen = 0;
+for ( int i=0; i<light.length; ++i )
+  	{	 
+	        float3 lightPos =  light[i].position.xyz;
+   		float3 surfPos = mul(mWv, IN.position).xyz;
+		float3 lightDir = 0;
+   		if (light[i].position.w == 0.0)
+		lightDir= normalize(lightPos);
+			else
+   		lightDir= normalize(lightPos - surfPos);
+    
+    		float3 surfNorm = mul(mWv, float4(IN.normal, 0)).xyz;
+    		float3 halfDir = normalize(lightDir + viewerDir);
+
+    		 lumDiff += 0.2*saturate(abs(dot(surfNorm, lightDir)))* light[i].diffuse ;
+    		 lumSpec += pow(saturate(abs(dot(surfNorm, halfDir))), material.shininess) ;//* light[i].specular;
+
+
+		float3 T, T2;
+		float3 R, R2;
+		// Compute fresnel at sheen layer and then ramp it up a bit.
+		float Kr = fresnel( -viewerDir, surfNorm, 1.0/1.4, R, T );
+
+		Kr = smoothstep( 0.0, 0.5, Kr );
+		float Kt = 1.0 - Kr;
+		// Compute the refracted light ray and the refraction
+		// coefficient.
+		float Kr2 = fresnel( -lightDir, surfNorm, 1.0/1.4, R2, T2 );
+		Kr2 = smoothstep( 0.0, 0.5, Kr2 );
+		float Kt2 = 1.0 - Kr2;
+
+		// do sheen..
+		float4 sheenColor = material.specular;
+
+		float3 Hn = halfDir;
+
+		sheen += 2.5 * Kr * sheenColor *( abs(dot(surfNorm,lightDir)) * (0.2 + pow(abs(dot(surfNorm,Hn)) , 34.0 )) );
+
+		// scratter
+		float4 skinColor = material.diffuse;//float4( 0.8, 0.7, 0.5,1 ) + float4(0.1,0.1,0.1,1.0);
+	
+		float3 ggr = float3( 0.8, 0.3, 0.0 );
+		float3 albedo = float3( 0.8, 0.5, 0.4 );
+		float3 temp = singleScatter( T2, T, surfNorm, ggr, albedo, 0.5);
+
+		subsurf += 2.5 * skinColor * abs(dot(surfNorm,lightDir)) * Kt * Kt2 *(temp.x+temp.y+temp.z);
+
+
+	}
+    float4 color = tex2D(diffuseMapSampler  , IN.texCoord);
+    OUT.color = color*subsurf;//+sheen*0.2;
+    return OUT;
+}
+
+//-----------------------
+
+float4 mulQuat(float4 q0, float4 q1)
+{
+    return float4(q0.w * q1.xyz + q1.w * q0.xyz + cross(q0.xyz, q1.xyz), 
+        q0.w * q1.w - dot(q0.xyz, q1.xyz));
+}
+
+//http://www.genesis3d.com/~kdtop/Quaternions-UsingToRepresentRotation.htm
+float3 rotateAxis(float3 p, float3 unitAxis, float angle)
+{
+    float sinAngle, cosAngle;
+    sincos(angle / 2, sinAngle, cosAngle);
+
+    //Rotation as quaternion
+    float4 q = float4(unitAxis * sinAngle, cosAngle);
+    float4 qI = float4(-q.xyz, q.w) / dot(q, q);
+    
+    return (mulQuat(mulQuat(q, float4(p, 0)), qI)).xyz;
+}
+
+//-----------------------
+VertToGeom vertexMain(AppToVert IN)
+{
+    VertToGeom OUT;
+    OUT.position = IN.position;
+    OUT.texCoord = IN.texCoord;
+    OUT.normal = IN.normal;
+
+    float4 worldPos =  mul(mW,float4(IN.position, 1));
+    float4 eyeVector = worldPos - mVIT[3];
+   
+    OUT.texCoord1 = eyeVector.xyz;
+    return OUT;
+}
+
+void plotHairVertex(float3 position, float3 normal, float4 color,float3 tc1)
+{
+    GeomToFrag OUT;
+    position = mul(mWI, float4(position, 1)).xyz;
+    normal = mul(mWI, float4(normal, 0)).xyz;
+    
+    float4 posProj = mul(mWvp, float4(position, 1));
+    OUT.posProj = posProj;
+    OUT.position = float4(position, 1);
+    OUT.normal = normal;
+    OUT.color = color;
+    OUT.texCoord1 = tc1;
+     emitVertex(OUT);//.posProj,OUT.position,OUT.normal,OUT.color);
+   // emitVertex(OUT.posProj,OUT.position,OUT.normal,OUT.color);
+}
+
+static const int HAIR_SEGS = 4;
+
+void drawHair(float3 position, float2 texCoord, float3 tangent,float3 tc1)
+{
+
+    float4 shaftColor = tex2D(diffuseMapSampler  , texCoord);
+
+    
+    plotHairVertex(position, tangent, shaftColor,tc1);
+
+    float3 curPos = position;
+    float3 curTan = tangent;
+
+    for (int i = 0; i < HAIR_SEGS; ++i)
+    {
+        float curMass = hairMass * CONV_g_TO_kg * (HAIR_SEGS - i) / HAIR_SEGS;
+        float3 gForce = gravity * curMass;
+        
+        //Find rotational force gravity applies around root
+        float3 forceNorm = curTan * dot(gForce, curTan);
+        float3 forceTan = gForce - forceNorm;
+        
+        //Gravity will cause a rotation this many degrees about last plot point
+        float angle = length(forceTan) / stiffness;
+        float3 curBinorm = normalize(cross(curTan, gravity));
+        
+        //Rotate tangent
+        curTan = rotateAxis(curTan, curBinorm, angle);
+
+        curPos += curTan * furLength / HAIR_SEGS;
+        
+        plotHairVertex(curPos, curTan, shaftColor,tc1);
+    }
+        restartStrip();    
+   
+}
+
+static const int TESS_MAX = 4;
+
+TRIANGLE LINE_OUT void geometryMain(AttribArray<VertToGeom> IN)
+{
+    float3 dPos01 = IN[1].position - IN[0].position;
+    float2 dTex01 = IN[1].texCoord - IN[0].texCoord;
+    float3 dPos02 = IN[2].position - IN[0].position;
+    float2 dTex02 = IN[2].texCoord - IN[0].texCoord;
+    float3 tc1 = IN[0].texCoord1;
+
+    for (int j = 0; j < TESS_MAX; ++j)
+    {
+        float jOff = j + .5;
+        
+        for (int i = 0; i < (TESS_MAX - j); ++i)
+        {
+            float iOff = i + .5;
+        
+            float3 position = IN[0].position 
+                + dPos01 * iOff / TESS_MAX
+                + dPos02 * jOff / TESS_MAX;
+            float2 texCoord = IN[0].texCoord
+                + dTex01 * iOff / TESS_MAX 
+                + dTex02 * jOff / TESS_MAX;
+            float3 normal = normalize(lerp(
+                lerp(IN[0].normal, IN[1].normal, (iOff + jOff) / TESS_MAX),
+                lerp(IN[0].normal, IN[2].normal, (iOff + jOff) / TESS_MAX),
+                jOff / TESS_MAX));
+            
+            float3 posWorld = mul(mW, float4(position, 1)).xyz;
+            float3 normWorld = mul(mW, float4(normal, 0)).xyz;
+
+            drawHair(posWorld, texCoord, normWorld,tc1);
+			 
+			
+        }
+    }
+
+}
+
+FragToOut fragmentMain(GeomToFrag IN,uniform NVSGMaterial material)
+{
+    FragToOut OUT;
+    float3 eyeVec = IN.texCoord1.xyz;
+    float3 viewerDir = -normalize(eyeVec);
+
+   float lumDiff = 0;
+ float lumSpec = 0;
+for ( int i=0; i<light.length; ++i )
+  	{	 
+
+     float3 lightPos =  light[i].position.xyz;
+     float3 surfPos = mul(mWv, IN.position).xyz;
+     
+     float3 lightDir = 0;
+     if (light[i].position.w == 0.0)
+ 	lightDir= normalize(lightPos);
+		else
+   	lightDir= normalize(lightPos - surfPos);
+
+     //For hair shaft, treat as surface of tube.
+     float3 surfTan = mul(mWv, float4(IN.normal, 0)).xyz;
+     float3 surfBinorm = cross(surfTan, viewerDir);
+     float3 surfNorm = cross(surfBinorm, surfTan);
+
+     float3 halfDir = normalize(lightDir + viewerDir);
+    
+     lumDiff += saturate(max(dot(surfNorm, lightDir),0)) ;//* light[i].diffuse;
+     lumSpec += pow(saturate(max(dot(surfNorm, halfDir),0)), material.shininess) ;//* light[i].specular;
+    }
+    OUT.color = IN.color*(lumDiff*material.diffuse)+ lumSpec ;//+ material.diffuse;
+    return OUT;
+}
+
+
+//--------------------------------------------
+
+technique Fur
+{
+    pass Skin
+    {
+        DepthTestEnable = true;
+        DepthMask       = true;
+        CullFaceEnable  = true;
+        VertexShader = compile latest vertexSkinMain();
+        PixelShader  = compile latest fragmentSkinMain(material);
+    }
+    
+    pass Hair
+    {
+        DepthTestEnable = true;
+        DepthMask       = true;
+        CullFaceEnable  = true;
+        VertexShader = compile latest vertexMain();
+        GeometryProgram = compile latest geometryMain();
+        PixelShader  = compile latest fragmentMain(material);
+    }
+}

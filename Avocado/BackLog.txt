@@ -1,0 +1,53 @@
+HLR / WIRFEFRAME - 
+	Collect connectivity info for each drawable and createa a new geonoew for edge data.
+Clipping planes - cgfx ignore plane. 
+		- plane not attached properly.
+		- plane apperance , use cg.
+Annotations - 
+	3D Shapes (cube, shpere, tetrastuff..).
+	2D Shapes (line, circle , ellipse, polygon ).
+	Pathlines.
+	Images.
+	(Billboard images.)
+	(video ?)
+	Lights.
+
+Materials - 
+	Assigner.
+
+Sub Elements.
+
+Selection - 
+Fix picker / sub/pre highlighting.
+create geo node and switch for selection. 
+fix selection apperance.
+Multi selection. 
+Area pick (?).
+
+Dragger - 
+	Attach to sub-selection properly (rotation?)
+	Fix center of rotation.
+
+Front layers.
+Fix transparency. use shader.
+Implment cook scene.
+Fix toon shader. use texture.
+Fix HLR activation.
+
+General - 
+	open/save/update.
+	fix timer.
+	Scene adjustment.scale , center.
+	Ortho camera.
+	Center of manipulation.
+	map file extension to elements.
+	map all of our string messsages.
+	Add tests.
+	Add Automation module.
+	Add statistics.
+	Load in thread.
+	Prefs.. per module ?
+	Add pages abstraction.
+	Save view 2 jpeg.
+	Save view 2 3ds/vrml/obj/dea.
+	Save doc 2 ppt.

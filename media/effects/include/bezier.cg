@@ -1,0 +1,349 @@
+// Copyright NVIDIA Corporation 2002-2007
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+float2 bezierCurve2P( float u, float2 p00, float2 p01, float2 p02, float2 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float2 p10 = v * p00 + u * p01;
+  [precise] float2 p11 = v * p01 + u * p02;
+  [precise] float2 p12 = v * p02 + u * p03;
+  
+  [precise] float2 p20 = v * p10 + u * p11;
+  [precise] float2 p21 = v * p11 + u * p12;
+  
+  [precise] float2 p30 = v * p20 + u * p21;
+  
+  return( p30 );
+}
+
+float2 bezierCurve2PD( float u, float2 p00, float2 p01, float2 p02, float2 p03, out float2 du )
+{
+  float v = 1 - u;
+  
+  [precise] float2 p10 = v * p00 + u * p01;
+  [precise] float2 p11 = v * p01 + u * p02;
+  [precise] float2 p12 = v * p02 + u * p03;
+  
+  [precise] float2 p20 = v * p10 + u * p11;
+  [precise] float2 p21 = v * p11 + u * p12;
+  
+  [precise] float2 p30 = v * p20 + u * p21;
+  
+  du = 3 * ( p20 - p21 );
+  
+  return( p30 );
+}
+
+float2 bezierCurve2D( float u, float2 p00, float2 p01, float2 p02, float2 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float2 p10 = v * p00 + u * p01;
+  [precise] float2 p11 = v * p01 + u * p02;
+  [precise] float2 p12 = v * p02 + u * p03;
+  
+  [precise] float2 p20 = v * p10 + u * p11;
+  [precise] float2 p21 = v * p11 + u * p12;
+  
+  [precise] float2 du = 3 * ( p20 - p21 );
+  
+  return( du );
+}
+
+float2 bezierCurve2Split( float u, float2 p00, float2 p01, float2 p02, float2 p03
+                        , out float2 p10, out float2 p12, out float2 p20, out float2 p21 )
+{
+  float v = 1 - u;
+  
+  [precise] float2 _p10 = v * p00 + u * p01;    p10 = _p10;
+  [precise] float2 _p11 = v * p01 + u * p02;
+  [precise] float2 _p12 = v * p02 + u * p03;    p12 = _p12;
+  
+  [precise] float2 _p20 = v * _p10 + u * _p11;  p20 = _p20;
+  [precise] float2 _p21 = v * _p11 + u * _p12;  p21 = _p21;
+  
+  [precise] float2 _p30 = v * _p20 + u * _p21;
+  
+  return( _p30 );
+}
+
+float2 bezierRect2P( float u, float v, AttribArray<float2> p )
+{
+  float2 p0 = bezierCurve2P( u, p[ 0], p[ 1], p[ 2], p[ 3] );
+  float2 p1 = bezierCurve2P( u, p[ 4], p[ 5], p[ 6], p[ 7] );
+  float2 p2 = bezierCurve2P( u, p[ 8], p[ 9], p[10], p[11] );
+  float2 p3 = bezierCurve2P( u, p[12], p[13], p[14], p[15] );
+  return( bezierCurve2P( v, p0, p1, p2, p3 ) );
+}
+
+float2 bezierTriangle2P( float u, float v, AttribArray<float2> p )
+{
+  float w = 1 - u - v;
+  [precise] float2 p00 = u * p[0] + v * p[1] + w * p[4];
+  [precise] float2 p01 = u * p[1] + v * p[2] + w * p[5];
+  [precise] float2 p02 = u * p[2] + v * p[3] + w * p[6];
+  [precise] float2 p03 = u * p[4] + v * p[5] + w * p[7];
+  [precise] float2 p04 = u * p[5] + v * p[6] + w * p[8];
+  [precise] float2 p05 = u * p[7] + v * p[8] + w * p[9];
+
+  [precise] float2 p10 = u * p00 + v * p01 + w * p03;
+  [precise] float2 p11 = u * p01 + v * p02 + w * p04;
+  [precise] float2 p12 = u * p03 + v * p04 + w * p05;
+
+  [precise] float2 result = u * p10 + v * p11 + w * p12;
+  return( result );
+}
+
+float3 bezierCurve3P( float u, float3 p00, float3 p01, float3 p02, float3 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float3 p10 = v * p00 + u * p01;
+  [precise] float3 p11 = v * p01 + u * p02;
+  [precise] float3 p12 = v * p02 + u * p03;
+  
+  [precise] float3 p20 = v * p10 + u * p11;
+  [precise] float3 p21 = v * p11 + u * p12;
+  
+  [precise] float3 p30 = v * p20 + u * p21;
+  
+  return( p30 );
+}
+
+float3 bezierCurve3PD( float u, float3 p00, float3 p01, float3 p02, float3 p03, out float3 du )
+{
+  float v = 1 - u;
+  
+  [precise] float3 p10 = v * p00 + u * p01;
+  [precise] float3 p11 = v * p01 + u * p02;
+  [precise] float3 p12 = v * p02 + u * p03;
+  
+  [precise] float3 p20 = v * p10 + u * p11;
+  [precise] float3 p21 = v * p11 + u * p12;
+  
+  [precise] float3 p30 = v * p20 + u * p21;
+  
+  du = 3 * ( p20 - p21 );
+  
+  return( p30 );
+}
+
+float3 bezierCurve3D( float u, float3 p00, float3 p01, float3 p02, float3 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float3 p10 = v * p00 + u * p01;
+  [precise] float3 p11 = v * p01 + u * p02;
+  [precise] float3 p12 = v * p02 + u * p03;
+  
+  [precise] float3 p20 = v * p10 + u * p11;
+  [precise] float3 p21 = v * p11 + u * p12;
+  
+  return( 3 * ( p20 - p21 ) );
+}
+
+float3 bezierRect3P( float u, float v, AttribArray<float3> p )
+{
+  float3 p0 = bezierCurve3P( u, p[ 0], p[ 1], p[ 2], p[ 3] );
+  float3 p1 = bezierCurve3P( u, p[ 4], p[ 5], p[ 6], p[ 7] );
+  float3 p2 = bezierCurve3P( u, p[ 8], p[ 9], p[10], p[11] );
+  float3 p3 = bezierCurve3P( u, p[12], p[13], p[14], p[15] );
+  return( bezierCurve3P( v, p0, p1, p2, p3 ) );
+}
+
+float3 bezierRect3PD( float u, float v, AttribArray<float3> p, out float3 du, out float3 dv )
+{
+  float3 du0, du1, du2, du3;
+  float3 p0 = bezierCurve3PD( u, p[ 0], p[ 1], p[ 2], p[ 3], du0 );
+  float3 p1 = bezierCurve3PD( u, p[ 4], p[ 5], p[ 6], p[ 7], du1 );
+  float3 p2 = bezierCurve3PD( u, p[ 8], p[ 9], p[10], p[11], du2 );
+  float3 p3 = bezierCurve3PD( u, p[12], p[13], p[14], p[15], du3 );
+  float3 pr = bezierCurve3P( v, p0, p1, p2, p3 );
+  du = bezierCurve3P( v, du0, du1, du2, du3 );
+
+  float3 dv0 = bezierCurve3D( v, p[0], p[4], p[ 8], p[12] );
+  float3 dv1 = bezierCurve3D( v, p[1], p[5], p[ 9], p[13] );
+  float3 dv2 = bezierCurve3D( v, p[2], p[6], p[10], p[14] );
+  float3 dv3 = bezierCurve3D( v, p[3], p[7], p[11], p[15] );
+  dv = bezierCurve3P( u, dv0, dv1, dv2, dv3 );  
+
+  return( pr );
+}
+
+float3 bezierTriangle3P( float u, float v, AttribArray<float3> p )
+{
+  float w = 1 - u - v;
+  [precise] float3 p00 = u * p[0] + v * p[1] + w * p[4];
+  [precise] float3 p01 = u * p[1] + v * p[2] + w * p[5];
+  [precise] float3 p02 = u * p[2] + v * p[3] + w * p[6];
+  [precise] float3 p03 = u * p[4] + v * p[5] + w * p[7];
+  [precise] float3 p04 = u * p[5] + v * p[6] + w * p[8];
+  [precise] float3 p05 = u * p[7] + v * p[8] + w * p[9];
+
+  [precise] float3 p10 = u * p00 + v * p01 + w * p03;
+  [precise] float3 p11 = u * p01 + v * p02 + w * p04;
+  [precise] float3 p12 = u * p03 + v * p04 + w * p05;
+
+  [precise] float3 p20 = u * p10 + v * p11 + w * p12;
+  return( p20 );
+}
+
+float3 bezierTriangle3PD( float u, float v, AttribArray<float3> p, out float3 du, out float3 dv )
+{
+  float w = 1 - u - v;
+  [precise] float3 p10 = u * p[0] + v * p[1] + w * p[4];
+  [precise] float3 p11 = u * p[1] + v * p[2] + w * p[5];
+  [precise] float3 p12 = u * p[2] + v * p[3] + w * p[6];
+  [precise] float3 p13 = u * p[4] + v * p[5] + w * p[7];
+  [precise] float3 p14 = u * p[5] + v * p[6] + w * p[8];
+  [precise] float3 p15 = u * p[7] + v * p[8] + w * p[9];
+
+  [precise] float3 p20 = u * p10 + v * p11 + w * p13;
+  [precise] float3 p21 = u * p11 + v * p12 + w * p14;
+  [precise] float3 p22 = u * p13 + v * p14 + w * p15;
+
+  [precise] float3 p30 = u * p20 + v * p21 + w * p22;
+  
+  du = 3 * ( p21 - p20 );
+  dv = 3 * ( p22 - p20 );
+  
+  return( p30 );
+}
+
+float4 bezierCurve4P( float u, float4 p00, float4 p01, float4 p02, float4 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float4 p10 = v * p00 + u * p01;
+  [precise] float4 p11 = v * p01 + u * p02;
+  [precise] float4 p12 = v * p02 + u * p03;
+  
+  [precise] float4 p20 = v * p10 + u * p11;
+  [precise] float4 p21 = v * p11 + u * p12;
+  
+  [precise] float4 p30 = v * p20 + u * p21;
+  
+  return( p30 );
+}
+
+float4 bezierCurve4PD( float u, float4 p00, float4 p01, float4 p02, float4 p03, out float4 du )
+{
+  float v = 1 - u;
+  
+  [precise] float4 p10 = v * p00 + u * p01;
+  [precise] float4 p11 = v * p01 + u * p02;
+  [precise] float4 p12 = v * p02 + u * p03;
+  
+  [precise] float4 p20 = v * p10 + u * p11;
+  [precise] float4 p21 = v * p11 + u * p12;
+  
+  [precise] float4 p30 = v * p20 + u * p21;
+  
+  du = 3 * ( p20 - p21 );
+  
+  return( p30 );
+}
+
+float4 bezierCurve4D( float u, float4 p00, float4 p01, float4 p02, float4 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float4 p10 = v * p00 + u * p01;
+  [precise] float4 p11 = v * p01 + u * p02;
+  [precise] float4 p12 = v * p02 + u * p03;
+  
+  [precise] float4 p20 = v * p10 + u * p11;
+  [precise] float4 p21 = v * p11 + u * p12;
+  
+  [precise] float4 du = 3 * ( p20 - p21 );
+  
+  return( du );
+}
+
+float4 bezierRect4P( float u, float v, AttribArray<float4> p )
+{
+  float4 p0 = bezierCurve4P( u, p[ 0], p[ 1], p[ 2], p[ 3] );
+  float4 p1 = bezierCurve4P( u, p[ 4], p[ 5], p[ 6], p[ 7] );
+  float4 p2 = bezierCurve4P( u, p[ 8], p[ 9], p[10], p[11] );
+  float4 p3 = bezierCurve4P( u, p[12], p[13], p[14], p[15] );
+  return( bezierCurve4P( v, p0, p1, p2, p3 ) );
+}
+
+float4 bezierTriangle4P( float u, float v, AttribArray<float4> p )
+{
+  float w = 1 - u - v;
+  [precise] float4 p00 = u * p[0] + v * p[1] + w * p[4];
+  [precise] float4 p01 = u * p[1] + v * p[2] + w * p[5];
+  [precise] float4 p02 = u * p[2] + v * p[3] + w * p[6];
+  [precise] float4 p03 = u * p[4] + v * p[5] + w * p[7];
+  [precise] float4 p04 = u * p[5] + v * p[6] + w * p[8];
+  [precise] float4 p05 = u * p[7] + v * p[8] + w * p[9];
+
+  [precise] float4 p10 = u * p00 + v * p01 + w * p03;
+  [precise] float4 p11 = u * p01 + v * p02 + w * p04;
+  [precise] float4 p12 = u * p03 + v * p04 + w * p05;
+
+  [precise] float4 result = u * p10 + v * p11 + w * p12;
+  return( result );
+}
+
+float4 ratBezierCurve3PD( float u, float4 p00, float4 p01, float4 p02, float4 p03, out float3 du )
+{
+  float v = 1 - u;
+
+  [precise] float4 p10 = v * p00 + u * p01;
+  [precise] float4 p11 = v * p01 + u * p02;
+  [precise] float4 p12 = v * p02 + u * p03;
+  
+  [precise] float4 p20 = v * p10 + u * p11;
+  [precise] float4 p21 = v * p11 + u * p12;
+  
+  [precise] float4 p30 = v * p20 + u * p21;
+  
+  du = 3 * ( p20.xyz / p20.w - p21.xyz / p21.w );
+  
+  return( p30 );
+}
+
+float3 ratBezierCurve3D( float u, float4 p00, float4 p01, float4 p02, float4 p03 )
+{
+  float v = 1 - u;
+  
+  [precise] float4 p10 = v * p00 + u * p01;
+  [precise] float4 p11 = v * p01 + u * p02;
+  [precise] float4 p12 = v * p02 + u * p03;
+  
+  [precise] float4 p20 = v * p10 + u * p11;
+  [precise] float4 p21 = v * p11 + u * p12;
+  
+  return( 3 * ( p20.xyz / p20.w - p21.xyz / p21.w ) );
+}
+
+float4 ratBezierRect3PD( float u, float v, AttribArray<float4> p, out float3 du, out float3 dv )
+{
+  float3 du0, du1, du2, du3;
+  float4 p0 = ratBezierCurve3PD( u, p[ 0], p[ 1], p[ 2], p[ 3], du0 );
+  float4 p1 = ratBezierCurve3PD( u, p[ 4], p[ 5], p[ 6], p[ 7], du1 );
+  float4 p2 = ratBezierCurve3PD( u, p[ 8], p[ 9], p[10], p[11], du2 );
+  float4 p3 = ratBezierCurve3PD( u, p[12], p[13], p[14], p[15], du3 );
+  float4 pr = bezierCurve4P( v, p0, p1, p2, p3 );
+  du = bezierCurve3P( v, du0, du1, du2, du3 );
+
+  float3 dv0 = ratBezierCurve3D( v, p[0], p[4], p[ 8], p[12] );
+  float3 dv1 = ratBezierCurve3D( v, p[1], p[5], p[ 9], p[13] );
+  float3 dv2 = ratBezierCurve3D( v, p[2], p[6], p[10], p[14] );
+  float3 dv3 = ratBezierCurve3D( v, p[3], p[7], p[11], p[15] );
+  dv = bezierCurve3P( u, dv0, dv1, dv2, dv3 );  
+
+  return( pr );
+}
+

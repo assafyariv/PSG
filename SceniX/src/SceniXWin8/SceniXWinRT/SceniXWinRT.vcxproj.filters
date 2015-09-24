@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="nvsg">
+      <UniqueIdentifier>{1cfba198-5d48-484c-874d-c0616a1198ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nvutil">
+      <UniqueIdentifier>{1e4a8bf1-3e41-418e-acc8-a43793d53416}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nvd3d">
+      <UniqueIdentifier>{8b434864-654a-4667-b98b-b88b49499694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nvmath">
+      <UniqueIdentifier>{b6d48a74-2cc6-4ed5-9a41-e2f72b979686}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="SceniXWinRT.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\..\nvsg\Drawable.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\GeoNode.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Group.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\IndexSet.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Node.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\nvsgImpl.cxx">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Object.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\ViewState.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\VertexAttributeSet.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StateSet.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Primitive.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Scene.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Camera.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\D3DDalData.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\D3DGlobal.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\RenderTargetD3D.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\RenderContextD3D.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\SceneRendererD3D.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\cgfx.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\DAL.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Buffer.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\IndependentPrimitiveSet.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\PrimitiveSet.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\ClipPlane.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Transform.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\FixedAllocator.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\nvutilImpl.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Reflection.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Subject.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\SWRSync.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Allocator.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvmath\Trafo.cpp">
+      <Filter>nvmath</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\HashGenerator.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StatePass.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StateVariant.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Observer.cpp">
+      <Filter>nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\PropertyList.cpp">
+      <Filter>nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Map.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\SceneAttribute.cpp">
+      <Filter>nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\Direct3DBase.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SceniXWinRT.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="..\..\intinc\D3DDal.h" />
+    <ClInclude Include="..\..\intinc\Direct3DBase.h" />
+    <ClInclude Include="..\..\intinc\DirectXHelper.h" />
+    <ClInclude Include="..\..\intinc\D3DBase.h" />
+  </ItemGroup>
+</Project>

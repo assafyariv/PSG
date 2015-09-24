@@ -1,0 +1,71 @@
+# Copyright NVIDIA Corporation 2011
+# TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+# *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+# OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+# AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+# BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+# WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+# BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+# ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+# BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
+
+cmake_minimum_required(VERSION 2.6)
+
+project( WinMinimal )
+
+file(TO_CMAKE_PATH $ENV{SCENIXHOME} SCENIX_HOME)
+set(CMAKE_MODULE_PATH "${SCENIX_HOME}/CMake")
+
+find_package(OpenGL REQUIRED )
+find_package(SceniX REQUIRED )
+
+SCENIX_SET_BINARY_FOLDERS()
+
+set( SCENIX_COMMON_BASE "${SCENIX_HOME}/samples/common" )
+
+set( WINMINIMAL_SOURCES
+  src/main.cpp
+  ${SCENIX_COMMON_BASE}/src/SimpleScene.cpp
+  ${SCENIX_COMMON_BASE}/src/MeshGenerator.cpp
+  ${SCENIX_COMMON_BASE}/src/SceneFunctions.cpp
+)
+
+set( WINMINIMAL_HEADERS
+  ${SCENIX_COMMON_BASE}/inc/SimpleScene.h
+  ${SCENIX_COMMON_BASE}/inc/MeshGenerator.h
+  ${SCENIX_COMMON_BASE}/inc/SceneFunctions.h
+)
+
+set (WINMINIMAL_RESOURCES
+  src/resource.h
+  src/resource.rc
+)
+
+SOURCE_GROUP (Resources FILES ${WINMINIMAL_RESOURCES})
+
+
+include_directories( ${SCENIX_INCLUDES} )
+include_directories( "." )
+include_directories( "inc" )
+include_directories( "${SCENIX_COMMON_BASE}/inc" )
+
+# Note the WIN32, using WinMain(), not main() like a console application.
+add_executable( WinMinimal WIN32
+  ${WINMINIMAL_SOURCES}
+  ${WINMINIMAL_HEADERS}
+  ${WINMINIMAL_RESOURCES}
+)
+
+target_link_libraries( WinMinimal
+  ${SCENIX_LIBS}
+  ${OPENGL_gl_LIBRARY}
+)
+
+if(TARGET SceniX)
+  add_dependencies( WinMinimal SceniX )
+  add_perforce_to_target( WinMinimal )
+endif()
+
+set_target_properties( WinMinimal PROPERTIES FOLDER "Samples")
+
+

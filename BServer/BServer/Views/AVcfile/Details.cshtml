@@ -1,0 +1,188 @@
+﻿@model BServer.Models.AVCfile
+
+@{
+    Layout = null;
+    ViewBag.Title = "Details";
+    string modelPage = "~/AVcfile/model/" + Model.id;
+    int HtmlNumber = Model.htmlNum;
+    string url = "/BServer/BServer/" + Model.location + "/view0" + ".htm";
+}
+
+@functions   
+{
+ public static int getColor (string url){
+  using (StreamReader reader = new StreamReader(url))
+   {
+     String line = String.Empty;
+     int index = -1; int retC = 0;
+     while ((line = reader.ReadLine()) != null)
+     {
+         index = line.IndexOf("BODY bgColor=#");
+         if (index > -1)
+         {
+             string Bcolor = line.Substring(index + 14, 6);
+             retC = Int32.Parse(Bcolor, System.Globalization.NumberStyles.HexNumber); //Convert..ToInt32(Bcolor);
+         } 
+     }
+  return retC;
+   }
+  }
+  
+  public static int[] getArrColor(int num, string location)
+  {
+      int[] ret = new int[num];
+
+      for(int i=0; i<num; i++)
+          ret[i] = getColor(@"C:/Education/BServer/BServer/" + location + "/view" + i + ".htm");
+
+      return ret;
+  }
+}
+
+
+<h2> @Html.DisplayFor(model => model.name) - @Html.DisplayFor(model => model.product.productName) @Html.ActionLink("Full Screen", "FullSModelP", new { id = Model.id })</h2>
+
+<table>
+    <tr>
+        <td>
+             <iframe id= "myModel" src= "@Url.Content(modelPage)"
+             webkitallowfullscreen mozallowfullscreen allowfullscreen scrolling="no"
+             width="400px" height="300px" frameborder="0" style="float: right; margin-left: 0;">
+             </iframe>
+        </td>
+        </tr>
+        <tr>
+        <td>
+             <iframe id="chgMe" src="@Url.Content(url)" 
+             webkitallowfullscreen mozallowfullscreen allowfullscreen scrolling="auto"
+              width="400px" height="900px" frameborder="0" style="float: right; margin-left: 0;">
+              </iframe>
+        </td>
+  </tr>
+  <!--
+  <tr>
+        <td>
+        </td>
+        <td>
+           
+             <button onclick= PreviousHtml()>Previous</button></li> 
+            <button onclick= nextHtml()>Next</button> </li> 
+
+        </td>
+   </tr>
+   -->
+</table>
+
+  
+
+
+   <script type="text/javascript">
+
+       var HtmlNum = @Model.htmlNum;
+       var index = 0;
+       var colors = {};
+      // document.addEventListener('mousemove', onDocumentMouseMove, false);
+       //document.addEventListener('touchstart', onDocumentMouseMove, false);
+       onLoad();
+
+       function onDocumentMouseMove(event)
+       {
+       event.preventDefault();
+		event.stopPropagation();
+       console.log("moooove");
+       noTouch();
+       }
+      
+       function noTouch()
+       {
+          console.log("moooove");
+          var sss = "/BServer/AVcfile/model/" + @Model.id
+           document.getElementById('myModel').src=sss;
+           document.removeEventListener('touchstart', onDocumentMouseMove, false);
+           document.removeEventListener('mousemove', onDocumentMouseMove, false);
+           document.removeEventListener('touchmove', onDocumentMouseMove, false);
+           window.location = "/Bserver/AVcfile/Details/" +  @Model.id;
+          // document.removeEventListener('mousemove', onDocumentMouseMove, false);
+     //   parent.document.style.pointer-events = 'none';
+       }
+
+       function onLoad()
+       {
+          @{var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();}
+           colors = @serializer.Serialize( getArrColor(Model.htmlNum, Model.location));
+       }
+
+
+       function getFirstBC()
+       {
+          // noTouch();
+          return colors[0];
+       }
+
+       function nextHtml()
+       {
+         index = (index+1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.location' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+
+          var colo = colors[Math.abs(index)]
+         document.getElementById('model').contentWindow.setBColor(colo);
+       }
+
+       function PreviousHtml()
+       {
+         index = (index-1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.location' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+
+          var colo = colors[Math.abs(index)]
+         document.getElementById('model').contentWindow.setBColor(colo);
+       }
+   
+   </script>
+
+@{
+    /*
+
+<fieldset>
+    <legend>AVCfile</legend>
+
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.description)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.description)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.date)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.date)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.details)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.details)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.data)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.data)
+    </div>
+</fieldset>
+<p>
+
+    @Html.ActionLink("Back to Product", "Details", "Products", new { id = Model.productId }, null )
+</p>
+
+
+  //      @Html.ActionLink("Edit", "Edit", new { id=Model.id }) |
+   // @Html.ActionLink("Back to List", "Index")
+     * */
+}

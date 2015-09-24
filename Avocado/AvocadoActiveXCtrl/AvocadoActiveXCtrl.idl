@@ -1,0 +1,49 @@
+// AvocadoActiveXCtrl.idl : type library source for ActiveX Control project.
+
+// This file will be processed by the MIDL compiler tool to
+// produce the type library (AvocadoActiveXCtrl.tlb) that will become a resource in
+// AvocadoActiveXCtrl.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(1D49C79F-2D78-417F-9123-8DF5C18E0A7F), version(1.0),
+  control ]
+library AvocadoActiveXCtrlLib
+{
+	importlib(STDOLE_TLB);
+
+	//  Primary dispatch interface for CAvocadoActiveXCtrlCtrl
+	[ 
+		uuid(B220DA40-0F9D-4B4F-9878-AA204FC855BE)	
+	]
+	dispinterface _DAvocadoActiveXCtrl
+	{
+		properties:
+		methods:
+	};
+
+	//  Event dispatch interface for CAvocadoActiveXCtrlCtrl
+
+	[ 
+		uuid(6976EC40-2A03-4DA5-A98B-F5FCE78691F7)	
+	]
+	dispinterface _DAvocadoActiveXCtrlEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+	};
+
+	//  Class information for CAvocadoActiveXCtrlCtrl
+	[
+		uuid(3702B77E-8FD4-452E-AE15-82BEEF40CBD2)
+	]
+	coclass AvocadoActiveXCtrl
+	{
+		[default] dispinterface _DAvocadoActiveXCtrl;
+		[default, source] dispinterface _DAvocadoActiveXCtrlEvents;
+	};
+
+};

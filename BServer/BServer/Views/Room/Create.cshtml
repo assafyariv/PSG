@@ -1,0 +1,61 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.room
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "room", FormMethod.Post, new { enctype = "multipart/form-data" })) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>room</legend>
+
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.name)
+            @Html.ValidationMessageFor(model => model.name)
+        </div>
+
+        @{
+            List<string> lis = new List<string> { "cube", "fff"};
+            }
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.typ)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.typ,// model.typs)
+            new SelectList(lis))
+                  
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.scale)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.scale)
+            @Html.ValidationMessageFor(model => model.scale)
+        </div>
+
+        <input type="file" name="file" id="file" /> 
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

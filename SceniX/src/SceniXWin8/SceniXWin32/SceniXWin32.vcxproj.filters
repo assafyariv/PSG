@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\nvsg">
+      <UniqueIdentifier>{74ba3c42-5c98-4aa8-93f8-e698c18c9eaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nvd3d">
+      <UniqueIdentifier>{33f7b25a-de06-4488-aab2-4f90dccc3920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nvmath">
+      <UniqueIdentifier>{586c2d52-817b-47dd-b336-69a6914b4abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nvutil">
+      <UniqueIdentifier>{f58f2dd4-9f8b-4f01-bf29-c67176a51d5d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceniXWin32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\intinc\Direct3DBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\intinc\DirectXHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceniXWin32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Group.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\IndependentPrimitiveSet.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\IndexSet.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Map.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Node.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\nvsgImpl.cxx">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Object.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Primitive.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\PrimitiveSet.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Scene.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\SceneAttribute.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StatePass.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StateSet.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\StateVariant.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Transform.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Triangles.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\VertexAttributeSet.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\ViewState.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Buffer.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Camera.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\cgfx.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\ClipPlane.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\DAL.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\Drawable.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvsg\GeoNode.cpp">
+      <Filter>Source Files\nvsg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\D3DGlobal.cpp">
+      <Filter>Source Files\nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\RenderContextD3D.cpp">
+      <Filter>Source Files\nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\RenderTargetD3D.cpp">
+      <Filter>Source Files\nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\SceneRendererD3D.cpp">
+      <Filter>Source Files\nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\D3DDalData.cpp">
+      <Filter>Source Files\nvd3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvmath\Trafo.cpp">
+      <Filter>Source Files\nvmath</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\nvutilImpl.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Observer.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\PropertyList.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Reflection.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Subject.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\SWRSync.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\Allocator.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\FixedAllocator.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvutil\HashGenerator.cpp">
+      <Filter>Source Files\nvutil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nvd3d\Direct3DBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

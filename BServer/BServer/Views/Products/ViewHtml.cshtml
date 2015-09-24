@@ -1,0 +1,140 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+
+@{
+    Layout = null;
+    ViewBag.Title = "Details";
+    string modelPage ="~/Products/model/" + Model.productID;
+    int HtmlNumber = Model.htmlNum;
+    string url = "/BService/" + Model.mainPubLocation + "/view0" + ".htm";
+    string ynet = "http://www.cnn.com";// "/BServer/BServer/Content/ynet.htm";
+}
+
+@functions   
+{
+ public static int getColor (string url){
+  using (StreamReader reader = new StreamReader(url))
+   {
+     String line = String.Empty;
+     int index = -1; int retC = 0;
+     while ((line = reader.ReadLine()) != null)
+     {
+         index = line.IndexOf("BODY bgColor=#");
+         if (index > -1)
+         {
+             string Bcolor = line.Substring(index + 14, 6);
+             retC = Int32.Parse(Bcolor, System.Globalization.NumberStyles.HexNumber); //Convert..ToInt32(Bcolor);
+         } 
+     }
+  return retC;
+   }
+  }
+  
+  public static int[] getArrColor(int num, string location)
+  {
+      int[] ret = new int[num];
+
+      for(int i=0; i<num; i++)
+          ret[i] = getColor(@"C:/Education/BServer/BServer/BServer/" + location + "/view" + i + ".htm");
+
+      return ret;
+  }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    </head>
+<body>
+
+<center>
+<table border="0" cellspacing ="0" cellpadding= "0" width "100%">
+    <tr height = 250px>
+         <td width ="40%" height="100%">
+             <iframe id="model" src= "@Url.Content(modelPage)" 
+             webkitallowfullscreen mozallowfullscreen allowfullscreen scrolling="no"
+             width="100%" height="100%" frameborder="0" style="float: right; margin-left: 0;">
+             </iframe>
+        </td>
+
+         <td width ="60%" height="100%">
+             <iframe id="chgMe" src="@Url.Content(url)" scrolling="no"
+              width="100%" height="100%" frameborder="0" style="float: right; margin-left: 0; text-align:right">
+             </iframe>
+            
+        </td>
+   
+    </tr>
+      <tr >
+        <td colspan=2>
+         <iframe id="chgMe" src="@Url.Content(ynet)" scrolling="no"
+              width="1000px" height="2000px" frameborder="0" style="float: right; margin-left: 0; text-align:right">
+             </iframe>
+        </td>
+         <!--
+        <td>
+       
+             <ul id="menu">
+            <li><button onclick= PreviousHtml()>Previous</button></li> 
+              <li><button onclick= nextHtml()>Next</button> </li> 
+             </ul>
+            
+           </td> 
+            -->
+        </tr>
+</table>
+</center>
+   <script type="text/javascript">
+
+       var HtmlNum = @Model.htmlNum;
+       var index = 0;
+       var colors = {};
+       onLoad();
+
+
+       function onLoad()
+       {
+          @{var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();}
+           colors = @serializer.Serialize( getArrColor(Model.htmlNum, Model.mainPubLocation));
+       }
+
+
+       function getFirstBC()
+       {
+
+          return colors[0];
+       }
+
+       function nextHtml()
+       {
+         index = (index+1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.mainPubLocation' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+
+       var colo = colors[Math.abs(index)]
+       document.getElementById('model').contentWindow.setBColor(colo);
+       }
+
+       function PreviousHtml()
+       {
+         index = (index-1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.mainPubLocation' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+
+         var colo = colors[Math.abs(index)]
+         document.getElementById('model').contentWindow.setBColor(colo);
+       }
+
+       function modelLoad(name , id)
+       {
+           var myurl =  "/Bserver/AVcfile/FullSModelP/" + id;
+         document.getElementById(name).src=myurl;
+       }
+   
+   </script>
+   </body>
+   </html>
+  

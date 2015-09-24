@@ -1,0 +1,627 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TUnzip" Collapsed="true">
+    <Position X="26" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAASIABACAAABAEAAAAIAIAAAgEAAgCEAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSplashWnd" Collapsed="true">
+    <Position X="27.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAEAAAAAAAAAAEAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CProductKeyDlg" Collapsed="true">
+    <Position X="29.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABEAAAAABAAAAAABEAAAAAAQAAAAAAAAAAAAAIQAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoCommandLineInfo" Collapsed="true">
+    <Position X="22.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAQAAQAAAAAAIAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAboutDlg" Collapsed="true">
+    <Position X="19" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAABAAAAAAQQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPublishDlg" Collapsed="true">
+    <Position X="19" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAACQQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGalleryManagerDlg2" Collapsed="true">
+    <Position X="26" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAABEBAQAAAQALABQAAAIEAAAAAAAEAAAEAAAgAAA=</HashCode>
+      <FileName>AvocadoGallery.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGalleryManagerDlg" Collapsed="true">
+    <Position X="24.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAABEAAAAAAAAJABQIAAAAQQAAAAAAAAQEAAAgAAA=</HashCode>
+      <FileName>AvocadoGallery.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyFilter" Collapsed="true">
+    <Position X="24.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAgAAAAEQQgBAAAAA=</HashCode>
+      <FileName>ShellView.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CElementViewMenuButton" Collapsed="true">
+    <Position X="27.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>ElementView.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyTemplateServer" Collapsed="true">
+    <Position X="26" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAgAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Avocado.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoDocTemplate" Collapsed="true">
+    <Position X="27.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Avocado.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoApp" Collapsed="true">
+    <Position X="20.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgRAMAAAIAEJiRGAMgANQAAJQCAEgEUCIAARBQFCQEA=</HashCode>
+      <FileName>Avocado.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoDocInterface" Collapsed="true">
+    <Position X="26" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAACAAAAAAAAAAIAIAAAAACAgAAAEAAAAAABAAA=</HashCode>
+      <FileName>AvocadoDoc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoDoc" Collapsed="true">
+    <Position X="24.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wQhRANAQEAIBCCCBmoxZwEgiVSwpwQQwAECDCAgBgBA=</HashCode>
+      <FileName>AvocadoDoc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GalleryRec" Collapsed="true">
+    <Position X="22.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAEAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>AvocadoGallery.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGalleryManager" Collapsed="true">
+    <Position X="22.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAgAAgACAAAAAABAQEAAIAgAAAAAAIIAQCIEAAQCA=</HashCode>
+      <FileName>AvocadoGallery.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGallerySuperManager" Collapsed="true">
+    <Position X="27.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAABAAAAAAAAAAAAAEAAIAAAAAAAAAAAEABECAAAA=</HashCode>
+      <FileName>AvocadoGallery.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoPathUtils" Collapsed="true">
+    <Position X="29.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AvocadoPathUtils.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoViewInterface" Collapsed="true">
+    <Position X="22.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAABIAgAAAAAAAQBgBAAA=</HashCode>
+      <FileName>AvocadoView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoView" Collapsed="true">
+    <Position X="20.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMCBICIYgYNiQCiIGIBBhQtBlTQBQNRAIkhNEFgcESA=</HashCode>
+      <FileName>AvocadoView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CElevator" Collapsed="true">
+    <Position X="29.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CElevator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CInPlaceFrame" Collapsed="true">
+    <Position X="20.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIACAAIAAAAAQAACTgAIgAQCgGFAAJAEAAAACAAAQNA=</HashCode>
+      <FileName>IpFrame.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CShellViewToolBar" Collapsed="true">
+    <Position X="26" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ShellView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CShellView" Collapsed="true">
+    <Position X="24.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACBAAAAiAEAACABAACBgBAAACAEAAEAgyABAAAIAAA=</HashCode>
+      <FileName>ShellView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoSrvrItem" Collapsed="true">
+    <Position X="19" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAEAAAAACIBAgAAAACAAEAAAAAgAAAAAAAA=</HashCode>
+      <FileName>SrvrItem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWebBrowserBar" Collapsed="true">
+    <Position X="20.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAGAAAAAAAUAAAEAAAAAAAAAACAAAMAAAAAGAAABACA=</HashCode>
+      <FileName>WebBrowserBar.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CClassToolBar" Collapsed="true">
+    <Position X="24.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ElementView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CElementView" Collapsed="true">
+    <Position X="26" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GCCACABAgAGLAUwChAAJgAAEBiAEgAEAABEBAEAQgCA=</HashCode>
+      <FileName>ElementView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWebBrowser2" Collapsed="true">
+    <Position X="19" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>dCgQAJVEAJJAECtMAgARSMAgiQBAFEVQMAFaCgAITwI=</HashCode>
+      <FileName>CWebBrowser2.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileViewToolBar" Collapsed="true">
+    <Position X="20.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileView" Collapsed="true">
+    <Position X="19" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACgCAAAiAEAACABAAAAkAAEBCAEAAFAgQABAABYAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COutlookBar" Collapsed="true">
+    <Position X="27.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>MainFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMainFrame" Collapsed="true">
+    <Position X="22.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>fr7++//5Tr/fjX0//nv/n5++77nt39/Hu6f83r//l/0=</HashCode>
+      <FileName>MainFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CServerViewToolBar" Collapsed="true">
+    <Position X="22.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ServerView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CServerView" Collapsed="true">
+    <Position X="20.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AASACAAAiAEAACABAAAAwABBAKAEAEEAAQABAAAIAAA=</HashCode>
+      <FileName>ServerView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CViewTree" Collapsed="true">
+    <Position X="29.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEABAAAAAAAAAAAAAABAAAAAAAAAAAAIAAAAgQAQAAA=</HashCode>
+      <FileName>ViewTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHtmlEditorToolBar" Collapsed="true">
+    <Position X="19" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>HtmlEditor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyHtmlEditCtrl" Collapsed="true">
+    <Position X="24.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>HtmlEditor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHtmlEditor" Collapsed="true">
+    <Position X="29.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACCUCQwAyAEAgCBBhERAwAAAAGAEAAUAoSIBAAQYAAA=</HashCode>
+      <FileName>HtmlEditor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="tm_unz_s" Collapsed="true">
+    <Position X="16.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAACACAAAAAAAAgAAAAAAAQAAAIAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="unz_global_info_s" Collapsed="true">
+    <Position X="4.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="unz_file_info_s" Collapsed="true">
+    <Position X="0.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gEAAgCAAAACAAAAAAIAEAEAYAAIAAgAAAAAAAIAAEIA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="z_stream_s" Collapsed="true">
+    <Position X="4.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAQAAAEAAAIAAAACQAAAIICAAEEAAQAAAEAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="inflate_huft_s" Collapsed="true">
+    <Position X="12.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="inflate_blocks_state" Collapsed="true">
+    <Position X="12.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAACAAAKAwCAACEAAAAAAAAAAAAIAQAAAAAAAgA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="inflate_codes_state" Collapsed="true">
+    <Position X="0.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABBQAAAAAAAACAAACAAAAAAAAAAACAgAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="internal_state" Collapsed="true">
+    <Position X="19" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAACAAAABAAAAAAAAAAAAAAAAAAAARAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="unz_file_info_internal_s" Collapsed="true">
+    <Position X="8.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_040c_14" Collapsed="true">
+    <Position X="8.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAICAAABAAAAAACAQoAAAAAAAAAAQAAAAAAAACA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_040c_15" Collapsed="true">
+    <Position X="4.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wAhAAgAAAAAIBgAAAAEAAEAAAAAAAACAjAgEAACAQAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_040c_16" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAgAAgAEAAAgAAAAAACgAAAAAAAAAABAAAEIiAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_040c_17" Collapsed="true">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="WORD" Collapsed="true">
+    <Position X="24.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="lutime_t" Collapsed="true">
+    <Position X="26" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="tm_unz" Collapsed="true">
+    <Position X="16.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="unz_global_info" Collapsed="true">
+    <Position X="4.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="unz_file_info" Collapsed="true">
+    <Position X="0.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Byte" Collapsed="true">
+    <Position X="20.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uInt" Collapsed="true">
+    <Position X="27.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uLong" Collapsed="true">
+    <Position X="19" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="voidpf" Collapsed="true">
+    <Position X="22.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="voidp" Collapsed="true">
+    <Position X="20.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="z_off_t" Collapsed="true">
+    <Position X="26" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="alloc_func" Collapsed="true">
+    <Position X="19" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="free_func" Collapsed="true">
+    <Position X="24.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="z_stream" Collapsed="true">
+    <Position X="4.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="z_streamp" Collapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uch" Collapsed="true">
+    <Position X="12.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uchf" Collapsed="true">
+    <Position X="12.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ush" Collapsed="true">
+    <Position X="8.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ushf" Collapsed="true">
+    <Position X="8.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ulg" Collapsed="true">
+    <Position X="29.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="check_func" Collapsed="true">
+    <Position X="22.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_huft" Collapsed="true">
+    <Position X="12.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_blocks_statef" Collapsed="true">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_codes_statef" Collapsed="true">
+    <Position X="0.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_block_mode" Collapsed="true">
+    <Position X="12.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_codes_mode" Collapsed="true">
+    <Position X="4.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="inflate_mode" Collapsed="true">
+    <Position X="8.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="unz_file_info_internal" Collapsed="true">
+    <Position X="8.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LUFILE" Collapsed="true">
+    <Position X="8.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="file_in_zip_read_info_s" Collapsed="true">
+    <Position X="4.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="unz_s" Collapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="unzFile" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="TUnzipHandleData" Collapsed="true">
+    <Position X="0.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="__unnamed_enum_040c_3" Collapsed="true">
+    <Position X="12.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAABAEAAAAgEIAAAgAiAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_040c_7" Collapsed="true">
+    <Position X="4.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAgIAAAAAAACAhAAAAAAAAEEAAAgAAAg=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_040c_11" Collapsed="true">
+    <Position X="8.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQAgCAgAAAAAAAAAAAAAQAAAgAgAAEAAAAQCAAAAAA=</HashCode>
+      <FileName>C:\Education\AvocadoNet\Avocado\AvocadoEngine\unzip.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

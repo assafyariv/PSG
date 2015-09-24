@@ -1,0 +1,69 @@
+// AvocadoHandlers.idl : IDL source for AvocadoHandlers
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AvocadoHandlers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(9F036E58-474A-47FD-9600-944952AA6799),
+	pointer_default(unique)
+]
+interface IPreview : IUnknown
+{
+};
+
+[
+	object,
+	uuid(0CC320A4-E4DF-4A09-96F4-94370586893D),
+	pointer_default(unique)
+]
+interface IThumbnail : IUnknown
+{
+};
+
+[
+	object,
+	uuid(B23E0090-60FC-4759-A906-908C86F1944F),
+	pointer_default(unique)
+]
+interface ISearch : IUnknown
+{
+};
+
+[
+	uuid(0518B3F7-C4B5-4F2C-A420-0152FFE3D376),
+	version(1.0),
+]
+library AvocadoHandlersLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(9CA7FB05-E893-4127-9BCB-A5334DE7C7EF)
+	]
+	coclass Preview
+	{
+		[default] interface IPreviewHandler;
+	};
+	[
+		uuid(5FDC1221-46DC-4F78-8228-E01101A886CE)
+	]
+	coclass Thumbnail
+	{
+		[default] interface IThumbnailProvider;
+	};
+	[
+		uuid(D6EBC255-EA82-45CB-9E32-614C0AAD5814)
+	]
+	coclass Search
+	{
+		[default] interface IFilter;
+	};
+};
+
+import "shobjidl.idl";
+import "thumbcache.idl";
+import "filter.idl";

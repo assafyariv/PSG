@@ -1,0 +1,30 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@{
+    ViewBag.Title = "background";
+}
+
+<h2>background</h2>
+
+
+@using (Html.BeginForm("background", "home", FormMethod.Post, new {enctype="multipart/form-data"})){
+    <p>background header:</p>
+     <input type="file" name="FileUpload1" /><br />
+     <p>background body:</p>
+     <input type="file" name="FileUpload2" /><br />
+     <p>background footer:</p>
+     <input type="file" name="FileUpload3" /><br />
+     <p>logo:</p>
+     <input type="file" name="FileUpload4" /><br />
+     <input type="submit" name="Submit" id="Submit" value="Upload" />
+                                                                           
+    }
+
+
+    @using (Html.BeginForm("backgroundDef", "home"))
+    {
+        <input type="submit" value="Default Background" />
+    }
+
+
+  <!-- @Html.ActionLink("Default Background", "backgroundDef") -->

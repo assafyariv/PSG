@@ -1,0 +1,16 @@
+texture TextureHDR_RGBA_ 
+<
+  string File = "../textures/crosscube.hdr";
+>;
+
+samplerCUBE textureHDR_RGBA = sampler_state
+{
+  Texture = <TextureHDR_RGBA_>;
+ 
+  MinFilter = LinearMipMapLinear; 
+  MagFilter = Linear; 
+
+  WrapS  = ClampToEdge;
+  WrapT  = ClampToEdge;
+  WrapR  = ClampToEdge;
+};

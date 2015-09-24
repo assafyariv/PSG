@@ -1,0 +1,58 @@
+﻿@model BServer.Models.AVCfile
+@{
+    Layout = null;
+    string modelPage = "~/AVcfile/FullSModelP/" + Model.id;
+    int HtmlNumber = Model.htmlNum;
+    string url = "/BServer/" + Model.location + "/view1" + ".htm";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PubDetalis</title>
+</head>
+<body>
+<table>
+<tr>
+<td width ="10%">
+      <button onclick= PreviousHtml()>Previous</button></li> 
+      </td>
+<td width ="80%">
+ <iframe id="chgMe" src="@Url.Content(url)" 
+            webkitallowfullscreen mozallowfullscreen allowfullscreen scrolling="auto"
+              width="500px" height="300px" frameborder="0" style="float: right; margin-left: 0;">
+              </iframe>
+            
+</td>
+
+<td width ="10%">
+      <button onclick= nextHtml()>Next</button> </li> 
+ </td>
+</tr>
+
+</table>
+<script type="text/javascript">
+
+       var HtmlNum = @Model.htmlNum;
+       var index = 0;
+
+       function nextHtml()
+       {
+         index = (index+1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.location' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+       }
+
+       function PreviousHtml()
+       {
+         index = (index-1)%HtmlNum;
+         var myurl =  "/BServer/" + '@Model.location' + "/view" +Math.abs(index)+ ".htm";
+         document.getElementById('chgMe').src=myurl;
+       }
+   
+   </script>
+
+</body>
+</html>

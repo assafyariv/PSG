@@ -1,0 +1,193 @@
+#include "include/NVSGLight.cg"
+#include "include/NVSGMaterial.cg"
+
+float4x4 mWvp : WorldViewProjection;
+float4x4 mWv : WorldView;
+float4x4 mWvIT : WorldInverseTranspose;
+float4x4 mW : World;
+float4x4 mWI : WorldInverse;
+float4x4 mVIT : ViewIT;
+
+texture texFurColor  <
+    string TextureType = "2D";
+>;
+float4 diffuseMapPosition = {1.0,1.0,0.0,0.0} ;
+sampler2D diffuseMapSampler = sampler_state
+{
+    Texture = <texFurColor>;
+    minFilter = Linear;
+    magFilter = Linear;
+    WrapS = Repeat;
+    WrapT = Repeat;
+};
+
+NVSGLight light[];
+NVSGMaterial material;
+//-----------------------
+
+struct AppToVert
+{
+    float3 position : POSITION;
+    float3 normal : NORMAL;
+    float2 texCoord : TEXCOORD0;
+};
+
+struct VertToFragSkin
+{
+    float4 posProj : POSITION;
+    float4 position : TEXCOORD5;
+    float3 normal : TEXCOORD6;
+    float2 texCoord : TEXCOORD0;
+  float3 texCoord1 : TEXCOORD1;
+};
+
+struct FragToOut
+{
+    float4 color : COLOR;
+};
+//-----------------------
+float fresnel( float3 i, float3 n, float eta, out float3 r, out float3 t )
+{
+	float result;
+	float c1;
+	float cs2;
+	float tflag;
+	c1 = dot(-i,n);
+	cs2 = 1.0-eta*eta*(1.0-c1*c1);
+	tflag = (float) (cs2 >= 0.0);
+	t = tflag * (((eta*c1-sqrt(cs2))*n) + eta*i);
+	// t is already unit length or (0,0,0)
+	// Compute Fresnel terms
+	// (From Global Illumination Compendeum.)
+	float ndott;
+	float cosr_div_cosi;
+	float cosi_div_cosr;
+	float fs;
+	float fp;
+	float kr;
+	ndott = dot(-n,t);
+	cosr_div_cosi = ndott / c1;
+	cosi_div_cosr = c1 / ndott;
+	fs = (cosr_div_cosi - eta) / (cosr_div_cosi + eta);
+	fs = fs * fs;
+	fp = (cosi_div_cosr - eta) / (cosi_div_cosr + eta);
+	fp = fp * fp;
+	kr = 0.5 * (fs+fp);
+	result = tflag*kr + (1.-tflag);
+	r = reflect( i, n );
+	return result;
+}
+float3 hgphase( float3 v1, float3 v2, float3 g )
+{
+	float costheta;
+	float3 g2;
+	float3 gtemp;
+	costheta = dot( -v1, v2 );
+	g2 = g*g;
+	gtemp = 1.0.xxx + g2 - 2.0*g*costheta;
+	gtemp = pow( gtemp, 1.5.xxx );
+	gtemp = (1.0.xxx - g2) / gtemp;
+	return gtemp;
+}
+
+float3 singleScatter( float3 wi, float3 wo, float3 n, float3 g,float3 albedo, float thickness )
+{
+	float win = abs(dot(wi,n));
+	float won = abs(dot(wo,n));
+	float eterm;
+	float3 result;
+	eterm = 1.0 - exp( (-((1./win)+(1./won))*thickness) );
+	result = eterm * (albedo * hgphase( wo, wi, g ) / (win + won));
+	return result;
+}
+
+//-----------------------
+VertToFragSkin vertexSkinMain(AppToVert IN)
+{
+   VertToFragSkin OUT;
+    OUT.posProj = mul(mWvp, float4(IN.position, 1));
+    float4 worldPos =  mul(mW,float4(IN.position, 1));
+    OUT.position =  float4(IN.position, 1);
+    float4 eyeVector = worldPos - mVIT[3];
+    OUT.texCoord = float2( IN.texCoord.x * diffuseMapPosition.x + diffuseMapPosition.z, IN.texCoord.y * diffuseMapPosition.y + diffuseMapPosition.w);
+    OUT.texCoord1 = eyeVector.xyz;
+    OUT.normal = IN.normal;
+    return OUT;
+}
+
+FragToOut fragmentSkinMain(VertToFragSkin IN, uniform NVSGMaterial material)
+{
+     FragToOut OUT;
+    float3 eyeVec = IN.texCoord1.xyz;
+    float3 viewerDir = -normalize(eyeVec);
+float lumDiff = 0;
+float lumSpec = 0;
+float4 subsurf = 0;
+float4 sheen = 0;
+for ( int i=0; i<light.length; ++i )
+  	{	 
+	        float3 lightPos =  light[i].position.xyz;
+   		float3 surfPos = mul(mWv, IN.position).xyz;
+		float3 lightDir = 0;
+   		if (light[i].position.w == 0.0)
+		lightDir= normalize(lightPos);
+			else
+   		lightDir= normalize(lightPos - surfPos);
+    
+    		float3 surfNorm = mul(mWv, float4(IN.normal, 0)).xyz;
+    		float3 halfDir = normalize(lightDir + viewerDir);
+
+    		 lumDiff += 0.2*saturate(abs(dot(surfNorm, lightDir)))* light[i].diffuse ;
+    		 lumSpec += pow(saturate(abs(dot(surfNorm, halfDir))), material.shininess) ;//* light[i].specular;
+
+
+		float3 T, T2;
+		float3 R, R2;
+		// Compute fresnel at sheen layer and then ramp it up a bit.
+		float Kr = fresnel( -viewerDir, surfNorm, 1.0/1.2, R, T );
+
+		Kr = smoothstep( 0.0, 0.5, Kr );
+		float Kt = 1.0 - Kr;
+		// Compute the refracted light ray and the refraction
+		// coefficient.
+		float Kr2 = fresnel( -lightDir, surfNorm, 1.0/1.2, R2, T2 );
+		Kr2 = smoothstep( 0.0, 0.5, Kr2 );
+		float Kt2 = 1.0 - Kr2;
+
+		// do sheen..
+		float4 sheenColor = material.specular;
+
+		float3 Hn = halfDir;
+
+		sheen +=  Kr * sheenColor *(abs(dot(surfNorm,lightDir)) * (0.2 + pow(abs(dot(surfNorm,Hn)) , material.shininess  )) );
+
+		// scratter
+		float4 skinColor = material.diffuse;//float4( 0.8, 0.7, 0.5,1 ) + float4(0.1,0.1,0.1,1.0);
+	
+		float3 ggr = float3( 0.8, 0.3, 0.0 );
+		float3 albedo = float3( 0.8, 0.5, 0.4 );
+		float3 temp = singleScatter( T2, T, surfNorm, ggr, albedo, 0.5);
+
+		subsurf +=  2.5*skinColor * abs(dot(surfNorm,lightDir)) * Kt * Kt2 *(temp.x+temp.y+temp.z);
+
+
+	}
+
+    float4 color = tex2D(diffuseMapSampler  , IN.texCoord);
+    OUT.color =  color * (subsurf +sheen );
+    return OUT;
+}
+
+//--------------------------------------------
+
+technique Fur
+{
+    pass Skin
+    {
+        DepthTestEnable = true;
+        DepthMask       = true;
+        CullFaceEnable  = true;
+        VertexShader = compile latest vertexSkinMain();
+        PixelShader  = compile latest fragmentSkinMain(material);
+    }
+}

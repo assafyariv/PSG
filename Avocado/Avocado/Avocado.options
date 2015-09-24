@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AvocadoOptions>
+  <app_options>
+    <startup_image></startup_image>
+  </app_options>
+  
+ <export_options>
+  <export_viewstate_html></export_viewstate_html>
+  <export_viewstate_thumb></export_viewstate_thumb>
+  <export_top_model></export_top_model>
+  <export_docparams></export_docparams>
+  <preffered_image_formar></preffered_image_formar>
+  <default_thumbsize></default_thumbsize>
+  <size_optimization></size_optimization>
+   <export_groups></export_groups>
+</export_options>
+  
+<galleries>
+  <material_gallery>
+  </material_gallery>
+  <background_gallery>
+  </background_gallery>
+  <light_preset_gallery>
+  </light_preset_gallery>
+  <accssesories_gallery>
+  </accssesories_gallery>
+  <orientations_gallery>
+  </orientations_gallery>
+  <acces_gallery>
+  </acces_gallery>
+</galleries>
+  
+ <servers>   
+   
+ </servers>
+  
+ <load_options>
+    <optimize_import></optimize_import>
+    <auto_fit_to_page></auto_fit_to_page>
+    <initial_scale></initial_scale>
+    <add_headlight></add_headlight>
+ </load_options>
+  
+ <navigation_options>
+   <user_nav_mode>
+     <center_of_rotation_behave></center_of_rotation_behave>
+     <rotation></rotation>
+     <pan></pan>
+     <zoom></zoom>
+   </user_nav_mode>
+
+   <default_navigation_mode></default_navigation_mode>
+   <highlight_on_spin></highlight_on_spin>
+   <speed></speed>
+ </navigation_options>
+
+<html_editor_behave>
+  <default_image_size></default_image_size>
+  <default_bg_color></default_bg_color>
+</html_editor_behave>
+
+ <graphics>
+    <deafault_bg_color></deafault_bg_color>
+    <enable_UI_animation></enable_UI_animation>
+    <fast_or_quality></fast_or_quality>
+    <anti_aliasing_samples></anti_aliasing_samples>
+ </graphics>
+  
+ <optix_options>
+    <optix_disable_all_layers></optix_disable_all_layers>
+    <optix_epsilon></optix_epsilon>
+    <optix_refract></optix_refract>
+    <optix_reflect></optix_reflect>
+    <optix_render_method></optix_render_method>
+    <use_optix_by_default></use_optix_by_default>
+ </optix_options>
+</AvocadoOptions>

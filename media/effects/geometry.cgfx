@@ -1,0 +1,75 @@
+
+float4x4 mvp : WorldViewProjection;
+float4x4 mvi : WorldViewInverseTranspose;
+float4x4 mv  : WorldView;
+
+struct VertexInput {
+  float4 position : POSITION;
+  float3 normal : NORMAL;
+  float4 texcoord : TEXCOORD0;
+};
+
+struct VertexOutput {
+  float4 position : POSITION;
+  float3 normal : TEXCOORD1;
+  float4 color  : COLOR;
+};
+
+VertexOutput vp(VertexInput input)
+{
+  VertexOutput output;
+  output.position = mul(mvp, input.position);
+  output.normal = mul((float3x3)mvi, input.normal);
+  output.color = float4(0, 1, 0, 1);
+  return output;
+}
+
+TRIANGLE 
+LINE_OUT
+void showNormals( AttribArray<float4> position : POSITION,
+                           AttribArray<float2> texCoord : TEXCOORD0,
+                           AttribArray<float3> normal : TEXCOORD1,
+                           AttribArray<float4> color : COLOR )
+{
+  float4 normalColor : COLOR = float4( 1, 0, 0, 1 );
+  float4 normalPosition0 : POSITION;
+  float4 normalPosition1 : POSITION;
+
+  // draw the normals
+  for (int i=0; i<position.length; i++)
+  {
+    normalPosition0 = position[i];
+    normalPosition1 = position[i] + float4( normal[i] * 20, 0 );
+
+    emitVertex(normalPosition0, texCoord[i], normal[i], normalColor );
+    emitVertex(normalPosition1, texCoord[i], normal[i], normalColor );
+
+    restartStrip();
+  }
+}
+
+float4 fp2( VertexOutput input ) : COLOR
+{
+  return input.color;
+}
+
+technique two
+{
+  pass p0
+  {
+    VertexProgram = compile gpu_vp vp();
+    GeometryProgram = compile gpu_gp showNormals();
+    FragmentProgram = compile gpu_fp fp2();
+    DepthTestEnable = true;
+    CullFaceEnable = false;
+  }
+
+  pass p1
+  {
+    VertexProgram = compile gpu_vp vp();
+    FragmentProgram = compile gpu_fp fp2();
+    DepthTestEnable = true;
+    CullFaceEnable = false;
+  }
+}
+

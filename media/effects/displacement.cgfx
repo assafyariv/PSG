@@ -1,0 +1,372 @@
+// Copyright NVIDIA Corporation 2002-2005
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+#include "include/NVSGLight.cg"
+#include "include/NVSGMaterial.cg"
+#include "phongLighting.cg"
+
+#define NORMAL_MAP
+
+float    bumpFactor = 0.2;
+float    bias  = 0.0;
+float    scale = 1.0;
+float    tessFactor  = 64.0;
+float    tessToBump  = 0.01;
+float4x4 modelToClip  : WorldViewProjection;
+float4x4 modelToWorld : World;
+float4x4 viewToWorld  : ViewI;
+float4x4 worldToModel : WorldI;
+
+texture diffuseMap : DiffuseMap
+<
+  string Desc        = "Diffuse map";
+  string TextureType = "2D";
+>;
+
+sampler2D diffuseMapSampler : TEXUNIT0 = sampler_state
+{
+  Texture   = <diffuseMap>;
+  MinFilter = Linear;
+  MagFilter = Linear;
+};
+
+texture bumpMap : BumpMap
+<
+  string Desc        = "Bump map";
+  string TextureType = "2D";
+>;
+
+sampler2D bumpMapSampler : TEXUNIT1 = sampler_state
+{
+  Texture   = <bumpMap>;
+  MinFilter = Linear;
+  MagFilter = Linear;
+};
+
+// gloabal ambient term
+float4 gAmbient : GlobalAmbient;
+
+NVSGLight     light[];
+NVSGMaterial  material;
+
+gp5vp void tessVertex
+(
+  in  float3 position  : POSITION,
+  in  float3 normal    : NORMAL,
+  in  float2 texCoord  : TEXCOORD0,
+  in  float3 tangent   : TEXCOORD6,
+  in  float3 binormal  : TEXCOORD7,
+  out float3 oPosition : POSITION,
+  out float3 oNormal   : TEXCOORD0,
+  out float2 oTexCoord : TEXCOORD1,
+  out float3 oTangent  : TEXCOORD6,
+  out float3 oBinormal : TEXCOORD7
+)
+{
+  oPosition = position;
+  oNormal   = normal;
+  oTexCoord = texCoord;
+  oTangent  = tangent;
+  oBinormal = binormal;
+}
+
+gp5tcp PATCH_3 void tessCtrl
+(
+  in int id                       : CONTROLPOINT_ID,
+  in AttribArray<float3> position : POSITION,
+  in AttribArray<float3> normal   : TEXCOORD0,
+  in AttribArray<float2> texCoord : TEXCOORD1,
+  in AttribArray<float3> tangent  : TEXCOORD6,
+  in AttribArray<float3> binormal : TEXCOORD7,
+
+  out float3 oPosition     : POSITION,
+  out float3 oNormal       : ATTR0,
+  out float2 oTexCoord     : ATTR1,
+  out float3 oTangent      : ATTR2,
+  out float3 oBinormal     : ATTR3,
+  out float  oEdgeTess[4]  : EDGETESS,
+  out float  oInnerTess[2] : INNERTESS
+)
+{
+  // Per control-point output
+  oPosition = position[id];
+  oNormal   = normal[id];
+  oTexCoord = texCoord[id];
+  oTangent  = tangent[id];
+  oBinormal = binormal[id];
+
+  // Per patch output, fixed tess for now
+  oEdgeTess[0] = oEdgeTess[1] = oEdgeTess[2] = oEdgeTess[3] = tessFactor;
+  oInnerTess[0] = oInnerTess[1] = tessFactor;
+}
+
+float3 barycentricV3F3( float2 uv, AttribArray<float3> value )
+{
+  float w = 1.0 - uv.x - uv.y;
+
+  return uv.x * value[0] + uv.y * value[1] + w * value[2];
+}
+
+float2 barycentricV3F2( float2 uv, AttribArray<float2> value )
+{
+  float w = 1.0 - uv.x - uv.y;
+
+  return uv.x * value[0] + uv.y * value[1] + w * value[2];
+}
+
+gp5tep PATCH_3 void tessEval
+(
+  in float2              uv       : UV,
+  in AttribArray<float3> position : POSITION,
+  in AttribArray<float3> normal   : ATTR0,
+  in AttribArray<float2> texCoord : ATTR1,
+  in AttribArray<float3> tangent  : ATTR2,
+  in AttribArray<float3> binormal : ATTR3,
+
+  out float4 oPosition : POSITION,
+  out float3 oNormal   : ATTR0,
+  out float2 oTexCoord : ATTR1,
+  out float3 worldPos  : ATTR2,
+  out float3 eyePos    : ATTR3,
+
+  uniform float4x4 modelToClip,
+  uniform float4x4 modelToWorld,
+  uniform float4x4 worldToModel,
+  uniform float4x4 viewToWorld
+)
+{
+  // interpolate all of the values
+  float3 p  = barycentricV3F3( uv, position );
+  float3 n  = barycentricV3F3( uv, normal );
+  float3 t  = barycentricV3F3( uv, tangent );
+  float3 b  = barycentricV3F3( uv, binormal );
+  float2 tc = barycentricV3F2( uv, texCoord );
+
+  float3x3 TBN = float3x3( normalize( t ), 
+                           normalize( b ),
+                           normalize( n ) );
+
+#ifdef NORMAL_MAP
+  float4 bs = tex2D( bumpMapSampler, tc );
+  float height  = 1.0 - bs.a;
+  // expand normal and correct y coord for these maps
+  // not sure why they are this way
+  float3 NV = bs.xyz * 2 - 1;
+  NV.y = -NV.y;
+#else
+  int3 tsiz = tex2Dsize( bumpMapSampler, 0.0 );
+  float2 so = float2( 1.0/tsiz.x, 1.0/tsiz.y );
+
+  float height  = tex2D( bumpMapSampler, tc ).x;
+  float heightL = tex2D( bumpMapSampler, tc-float2(so.x,0) ).x;
+  float heightB = tex2D( bumpMapSampler, tc-float2(0,so.y) ).x;
+  float heightT = heightB-tex2D(bumpMapSampler, tc+float2(0,so.y)).x;
+  float heightR = heightL-tex2D(bumpMapSampler, tc+float2(so.x,0)).x;
+
+  heightT *= bumpFactor;
+  heightR *= bumpFactor;
+  float3 NV = float3( heightR, heightT, 1 ) / sqrt( heightT*heightT + heightR*heightR + 1 );
+#endif
+
+  // rotate into object space
+  NV = mul( NV, TBN );
+
+  p += (scale * height + bias) * n;
+
+  oPosition = mul( modelToClip, float4( p, 1.0f ) );
+  oNormal = mul( float4( NV, 0.0f ), worldToModel ).xyz;
+  oTexCoord = tc;
+  
+  // compute world space position
+  worldPos = mul( modelToWorld, float4( p, 1.0f ) ).xyz;
+  
+  // compute eye position in world space
+  eyePos = mul( viewToWorld, float4( 0.0f, 0.0f, 0.0f, 1.0f ) ).xyz;
+}
+
+gp5fp void tessFragment
+(
+  float3 normal    : ATTR0,
+  float2 texCoord  : ATTR1,
+  float3 worldPos  : ATTR2,
+  float3 eyePos    : ATTR3,
+
+  out float4 oColor : COLOR,
+
+  uniform float4 gAmbient,
+  uniform NVSGMaterial material
+)
+{
+  float3 P = worldPos;
+  float3 V = normalize(eyePos - P);
+  float3 N = normalize(normal);
+
+  float3 ambientSum = 0;
+  float3 diffuseSum = 0;
+  float3 specularSum = 0;
+
+  for ( int i=0; i<light.length; ++i )
+  {
+    float3 ambientLight;
+    float3 diffuseLight;
+    float3 specularLight;
+
+    lighting( light[i], P, N, V, material.shininess, ambientLight, diffuseLight, specularLight );
+
+    // sum up
+    ambientSum += ambientLight;
+    diffuseSum += diffuseLight;
+    specularSum += specularLight;
+  }
+
+  float4 ambient = material.ambient * gAmbient * float4(ambientSum, 1);
+  float4 diffuse = tex2D( diffuseMapSampler, texCoord ) * float4(diffuseSum, 1);
+  float4 specular = material.specular * float4(specularSum, 1);
+
+  oColor = material.emission + ambient + diffuse + specular; 
+}
+
+gp5vp void bumpVertex
+(
+  in  float3 position  : POSITION,
+  in  float3 normal    : NORMAL,
+  in  float2 texCoord  : TEXCOORD0,
+  in  float3 tangent   : TEXCOORD6,
+  in  float3 binormal  : TEXCOORD7,
+
+  out float4 oPosition : POSITION,
+  out float3 oNormal   : ATTR1,
+  out float2 oTexCoord : ATTR2,
+  out float3 worldPos  : ATTR3,
+  out float3 eyePos    : ATTR4,
+  out float3 oTangent  : ATTR5,
+  out float3 oBinormal : ATTR6,
+
+  uniform float4x4 modelToClip,
+  uniform float4x4 modelToWorld,
+  uniform float4x4 worldToModel,
+  uniform float4x4 viewToWorld
+)
+{
+  oPosition = mul( modelToClip, float4( position, 1.0f ) );
+  oNormal   = mul( float4( normal, 0.0f ), worldToModel ).xyz;
+  oTangent  = mul( float4( tangent, 0.0f ), worldToModel ).xyz;
+  oBinormal = mul( float4( binormal, 0.0f ), worldToModel ).xyz;
+  oTexCoord = texCoord;
+  
+  // compute world space position
+  worldPos = mul( modelToWorld, float4( position, 1.0f ) ).xyz;
+  
+  // compute eye position in world space
+  eyePos = mul( viewToWorld, float4( 0.0f, 0.0f, 0.0f, 1.0f ) ).xyz;
+}
+
+gp5fp void bumpFragment
+(
+  in float3 normal    : ATTR1,
+  in float2 texCoord  : ATTR2,
+  in float3 worldPos  : ATTR3,
+  in float3 eyePos    : ATTR4,
+  in float3 tangent   : ATTR5,
+  in float3 binormal  : ATTR6,
+
+  out float4 oColor : COLOR,
+
+  uniform float4 gAmbient,
+  uniform NVSGMaterial material
+)
+{
+  float3 P = worldPos;
+  float3 V = normalize(eyePos - P);
+  float3 N = normalize(normal);
+  float3 T = normalize(tangent);
+  float3 B = normalize(binormal);
+
+  // BUMP MAPPING
+  float3x3 TBN = float3x3( T, B, N );
+  float2 offset = float2(0);
+
+#ifdef NORMAL_MAP
+  float height = (1.0 - tex2D( bumpMapSampler, texCoord ).a) * (scale*tessToBump) + (bias*tessToBump);
+  offset = height * mul( TBN, V ).xy;
+  texCoord += offset;
+
+  float3 NV = tex2D( bumpMapSampler, texCoord ).xyz;
+  // expand normal and correct Y coord for these maps
+  // not sure why they are this way
+  NV = NV * 2 - 1;
+  NV.y = -NV.y;
+#else
+  float height = tex2D( bumpMapSampler, texCoord ).x * (scale*tessToBump) + (bias*tessToBump);
+
+  offset = height * mul( TBN, V ).xy;
+  texCoord += offset;
+
+  int3 tex = tex2Dsize( bumpMapSampler, 0.0 );
+  float2 so = float2( 1.0/tex.x, 1.0/tex.y );
+
+  float heightL = tex2D( bumpMapSampler, texCoord-float2(so.x,0) ).x;
+  float heightB = tex2D( bumpMapSampler, texCoord-float2(0,so.y) ).x;
+  float heightT = heightB-tex2D(bumpMapSampler, texCoord+float2(0,so.y)).x;
+  float heightR = heightL-tex2D(bumpMapSampler, texCoord+float2(so.x,0)).x;
+  // from Cg Tutorial.
+  heightT *= bumpFactor;
+  heightR *= bumpFactor;
+  float3 NV = float3( heightR, heightT, 1 ) / sqrt( heightT*heightT + heightR*heightR + 1 );
+#endif
+
+  // NV * TBN  because want to rotate into object space
+  N = mul( NV, TBN );
+
+  float3 ambientSum = 0;
+  float3 diffuseSum = 0;
+  float3 specularSum = 0;
+
+  for ( int i=0; i<light.length; ++i )
+  {
+    float3 ambientLight;
+    float3 diffuseLight;
+    float3 specularLight;
+
+    lighting( light[i], P, N, V, material.shininess, ambientLight, diffuseLight, specularLight );
+
+    // sum up
+    ambientSum += ambientLight;
+    diffuseSum += diffuseLight;
+    specularSum += specularLight;
+  }
+
+  float4 ambient = material.ambient * gAmbient * float4(ambientSum, 1);
+  float4 diffuse = tex2D( diffuseMapSampler, texCoord ) * float4(diffuseSum, 1);
+  float4 specular = material.specular * float4(specularSum, 1);
+
+  oColor = material.emission + ambient + diffuse + specular; 
+}
+
+technique FragmentLighting_Patches
+{
+  pass p0
+  {
+    VertexProgram                 = compile gp5vp tessVertex();
+    TessellationControlProgram    = compile gp5tcp tessCtrl();
+    TessellationEvaluationProgram = compile gp5tep "TRIANGLES" tessEval( modelToClip, modelToWorld, worldToModel, viewToWorld );
+    FragmentProgram               = compile gp5fp tessFragment( gAmbient, material );
+  }
+}
+
+technique FragmentLighting_Bumped
+{
+  pass p0
+  {
+    VertexProgram                 = compile gp5vp bumpVertex( modelToClip, modelToWorld, worldToModel, viewToWorld );
+    FragmentProgram               = compile gp5fp bumpFragment( gAmbient, material );
+  }
+}

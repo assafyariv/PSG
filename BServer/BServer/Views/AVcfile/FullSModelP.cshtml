@@ -1,0 +1,444 @@
+﻿@model BServer.Models.AVCfile
+
+@{
+    Layout = null;
+    int HtmlNumber = Model.htmlNum;
+    string url = "/BServer/" + Model.location + "/view0" + ".htm";
+}
+
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+	
+    	  <style type ="text/css">
+			body {
+				background:#000;
+				color:#000;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:monospace;
+				font-size:13px;
+				text-align:center;
+			}
+			a { color:skyblue }
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #fff;
+				background:rgba(0,0,0,0.65);
+				padding: 5px;
+				text-align: center;
+				z-index:100;
+				display:block;
+			}
+		</style>
+	</head>
+<body>
+ @Scripts.Render("~/bundles/Three")
+       @Scripts.Render("~/bundles/ThreeJS")
+        @Scripts.Render("~/bundles/Text")
+         
+          @Styles.Render("~/Content/themes/base/css", "~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+       
+        <!--three D part-->
+     	<div id="container"></div>
+           <div id="loading"><br />@Html.DisplayFor(model => model.name)  Loading...  </div>
+           <div id="HtmlFrame"></div>
+	<script type="text/javascript">
+
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+			var FLOOR = -250;
+
+			var container, stats;
+
+			var camera, scene, controls;
+			var renderer, effect;
+
+			var mesh;
+
+			var textureCube;
+			var cameraCube, sceneCube;
+
+			var loader;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera.position.set( 185, 40, 170 );
+				scene.add( camera );
+
+				controls = new THREE.TrackballControls3( camera );
+				controls.dynamicDampingFactor = 0.25;
+                //controls.noPan = true;
+
+
+				// SKYBOX
+
+				sceneCube = new THREE.Scene();
+				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				sceneCube.add( cameraCube );
+                // "/BServer/Content/Romms/sky/sky/"; 
+
+				var r = '@Model.puroom.location' + "/";  
+				var urls = [ r + "px.jpg", r + "nx.jpg",
+							 r + "py.jpg", r + "ny.jpg",
+							 r + "pz.jpg", r + "nz.jpg" ];
+
+
+				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
+
+				var material = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
+				mesh.flipSided = true;
+				sceneCube.add( mesh );
+
+				// LIGHTS
+                      var light = new THREE.DirectionalLight(0xffffff, 2);
+	        light.position.set(1, 1, 1).normalize();
+	        scene.add(light);
+
+            THREE.ColorUtils.adjustHSV( light.color, 0, -0.75, 0 );
+
+	        var light = new THREE.DirectionalLight(0xffffff);
+	        light.position.set(-1, -1, -1).normalize();
+	        scene.add(light);
+
+
+				//var light = new THREE.PointLight( 0xffffff, 1 );
+				//light.position.set( 2, 5, 1 );
+				//light.position.multiplyScalar( 30 );
+                light.castShadow = true;
+
+	        //light.shadowCameraNear = 700;
+	        //light.shadowCameraFar = camera.far;
+	        //light.shadowCameraFov = 50;
+
+	        //light.shadowCameraVisible = true;
+
+	        //light.shadowBias = 0.0001;
+	        //light.shadowDarkness = 0.5;
+
+	        //light.shadowMapWidth = SHADOW_MAP_WIDTH;
+	        //light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				scene.add( light );
+
+				THREE.ColorUtils.adjustHSV( light.color, 0, -0.75, 0 );
+
+				//var light = new THREE.PointLight( 0xffffff, 0.75 );
+				//light.position.set( -12, 4.6, 2.4 );
+				//light.position.multiplyScalar( 30 );
+                  //    light.castShadow = true;
+				//scene.add( light );
+
+				THREE.ColorUtils.adjustHSV( light.color, 0, -0.5, 0 );
+
+				scene.add( new THREE.AmbientLight( 0x050505 ) );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff, clearAlpha: 1 } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				// STATS
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '5px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				// LOADER
+
+				var start = Date.now();
+
+				// classic way via BinaryLoader
+                   @{string modelPath = "/BServer/" + Model.location + "/modeltop.js";}
+
+				loader = new THREE.JSONLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				var callbackScene   = function( geometry ) {
+                waitFor(true);
+					createScene( geometry,  0, 0, 0, 30 )
+
+					var end = Date.now();
+
+					console.log( "load time:", end - start, "ms" );
+                    waitFor(true);
+
+				};
+
+				loader.load('@modelPath', callbackScene );
+
+
+				// new way via CTMLoader and separate parts
+                
+	      //  var loader = new THREE.JSONLoader();
+ /*    
+         
+				var useWorker = true,
+					useBuffers = true;
+
+				loaderCTM = new THREE.CTMLoader( renderer.context, true );
+				document.body.appendChild( loaderCTM.statusDomElement );
+
+				var position = new THREE.Vector3( -105, -78, -40 );
+				var scale = new THREE.Vector3( 30, 30, 30 );
+
+				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+
+					hackMaterials( materials );
+
+					for ( var i = 0; i < geometries.length; i ++ ) {
+
+						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
+						mesh.position = position;
+						mesh.scale = scale;
+						mesh.doubleSided = true;
+						scene.add( mesh );
+
+					}
+
+					loaderCTM.statusDomElement.style.display = "none";
+
+					var end = Date.now();
+
+					console.log( "load time:", end - start, "ms" );
+
+				}, useWorker, useBuffers );
+                */
+
+              //  effect = new THREE.AnaglyphEffect( renderer );
+			//	effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+            function waitFor(wait)
+            {
+              if(wait){
+              document.getElementById("loading").style.display = "none";
+              //document.getElementById("content").style.display = "block";
+              }else{
+              
+              }
+
+            }
+			//
+
+			function hackMaterials( materials ) {
+
+				for ( var i = 0; i < materials.length; i ++ ) {
+
+					var m = materials[ i ];
+
+					if ( m.name.indexOf( "Body" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.combine = THREE.MixOperation;
+						mm.reflectivity = 0.75;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.combine = THREE.MultiplyOperation;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.color.copy( m.color );
+						mm.combine = THREE.MixOperation;
+						mm.reflectivity = 0.25;
+						mm.opacity = m.opacity;
+						mm.transparent = true;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "Material.001" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.shininess = 30;
+						mm.color.setHex( 0x404040 );
+						mm.metal = true;
+						mm.perPixel = true;
+
+						materials[ i ] = mm;
+
+					}
+
+				}
+
+			}
+
+			//
+
+			function createScene( geometry, x, y, z, s ) {
+
+                  mat = new MatLib();
+             
+             if ('@Model.name' == ("Casio Fishing Watch"))
+             {
+            for(var u=0; u< geometry.materials.length-60; u++){
+             geometry.materials[u] =  mat.mlib["Chrome"];
+             }
+             }
+
+             if ('@Model.name' == ("Seiko Classic Silver"))
+             {
+            for(var u=0; u< geometry.materials.length-55; u++){
+             m = geometry.materials[u] ;
+               m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;//mat.mlib["Gold"];
+              // m.specular=0xffffff;
+             }
+             }
+
+               if ('@Model.name' == ("Seiko Classic - Bronze"))
+             {
+            for(var u=0; u< geometry.materials.length-55; u++){
+             m = geometry.materials[u] ;
+               m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;//mat.mlib["Gold"];
+              // m.specular=0xffffff;
+             }
+             }
+             
+
+				loader.statusDomElement.style.display = "none";
+
+				//THREE.GeometryUtils.center( geometry );
+				//hackMaterials( geometry.materials );
+
+				//var material = new THREE.MeshFaceMaterial();
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				mesh.position.set( x, y, z );
+				
+                 sf = 40 / mesh.boundRadius;
+
+	        mesh.scale.x *= sf;
+	        mesh.scale.y *= sf;
+	        mesh.scale.z *= sf;
+
+                mesh.castShadow = true;
+	            mesh.receiveShadow = true;
+				//mesh.doubleSided = true;
+				scene.add( mesh );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraCube.updateProjectionMatrix();
+
+			}
+
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				controls.update();
+
+				cameraCube.rotation.copy( camera.rotation );
+
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
+
+               // effect.render( scene, camera );
+
+			}
+            			</script>
+</body>
+		

@@ -1,0 +1,180 @@
+// Copyright NVIDIA Corporation 2002-2005
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+#include "include/Quad.cgh"
+
+float4x4 mvp  : WorldViewProjection;
+float4x4 mv   : WorldView;
+float4x4 mvit : WorldViewIT;
+// transform object vertices to world-space:
+float4x4 gworld : World ;
+float4x4 gWorldITXf : WorldInverseTranspose;
+float4x4 gViewIXf : ViewInverse;
+
+float gNear <
+    string UIName = "Near Depth";
+    string UIWidget = "slider";
+    float UIMin = 0.01f;
+    float UIMax = 100.0f;
+    float UIStep = 0.01f;
+> = 0.012;
+
+float gFar <
+    string UIName = "Far Depth";
+    string UIWidget = "slider";
+    float UIMin = 0.1f;
+    float UIMax = 100.0f;
+    float UIStep = 0.01f;
+> = 200.0;
+// original far was 10
+
+float3 Color = {1.0f, .0f, .0f};
+
+float4 vertex(uniform float4x4 modelViewProj,
+              uniform float4x4 modelView,
+              uniform float4x4 modelViewIT,
+              float4 P : POSITION,
+              float4 N : NORMAL,
+              out float4 CC : COLOR0,
+              out float3 Pcam : TEXCOORD0,
+              out float3 Ncam : TEXCOORD1) : POSITION
+{
+  CC.xyz = .5 * Color.xyz + .5 * normalize(N.xyz);
+  Pcam   = mul(modelView, P).xyz;
+  Ncam   = mul(modelViewIT, N).xyz;
+  
+  return mul(modelViewProj, P);
+}
+
+float4 fragment(uniform float3 C,
+                float3 Pcam : TEXCOORD0, 
+                float3 Ncam : TEXCOORD1) : COLOR 
+{
+  float3 Plight = float3(-10,10,10);
+  float3 wi     = normalize(Plight - Pcam);
+  float3 wo     = normalize(-Pcam);
+  float3 H      = normalize(wi+wo);
+  Ncam          = normalize(Ncam);
+  
+  float3 Ci = float3(.1, .1, .1);
+  Ci += max(0., dot(wi, Ncam)) * (.5 * C + pow(max(0., dot(Ncam, H)), 20.f));
+  
+  return float4(Ci, 1);
+}
+
+
+
+/* data from application vertex buffer */
+struct appdata {
+    float3 Pos    : POSITION;
+    float4 UV        : TEXCOORD0;
+    float4 Normal    : NORMAL;
+    float4 Tangent    : TANGENT0;
+    float4 Binormal    : BINORMAL0;
+};
+
+
+/* data passed from vertex shader to pixel shader */
+struct vertexOutput {
+    float4 HPosition	: POSITION;
+    float3 WorldNormal	: TEXCOORD0;
+    float3 WorldEyeVec	: TEXCOORD1;
+    float3 EyePos	: TEXCOORD2;
+	// float4 Diff			: COLOR0;
+};
+
+vertexOutput simpleVS(appdata IN,uniform float4x4 WorldITXf, // our four standard "untweakable" xforms
+	uniform float4x4 world,
+	uniform float4x4 ViewIXf,
+	uniform float4x4 WvpXf,
+	uniform float4x4 WorldViewXf
+) {
+    vertexOutput OUT = (vertexOutput)0;
+    float4 Po = float4(IN.Pos,1.0);
+    OUT.HPosition = mul(WvpXf,Po);
+    float4 Nn = normalize(IN.Normal);
+    OUT.WorldNormal = mul(Nn,WorldITXf).xyz;
+    float4 Pw = mul(Po,world);
+    OUT.EyePos = mul(WorldViewXf,Po).xyz;
+    OUT.WorldEyeVec = normalize(float3(ViewIXf[0].w,ViewIXf[1].w,ViewIXf[2].w) - Pw.xyz);
+    return OUT;
+}
+QUAD_REAL4 vecColorN(QUAD_REAL3 V) {
+    QUAD_REAL3 Nc = 0.5 * (normalize(V.xyz) + ((1.0).xxx));
+    return QUAD_REAL4(Nc,1);
+}
+
+QUAD_REAL4 normPS(vertexOutput IN)   : COLOR { return vecColorN(IN.WorldNormal); }
+QUAD_REAL4 deepPS(vertexOutput IN,
+		    uniform float Near,
+		    uniform float Far
+)   : COLOR {
+    QUAD_REAL d = (abs(IN.EyePos.z));//-Near)/(Far-Near);
+    return QUAD_REAL4(d.xxx,1);
+}
+
+void geomMRT_PS(
+		vertexOutput IN,
+		uniform float Near,
+		uniform float Far,
+		out QUAD_REAL4 normColor : COLOR0,
+		out QUAD_REAL4 deepColor : COLOR1
+) {
+	normColor = vecColorN(IN.WorldNormal);
+    QUAD_REAL d = (abs(IN.EyePos.z)-Near)/(Far-Near);
+	deepColor = QUAD_REAL4(d.xxx,1);
+}
+
+technique Main
+{
+  pass p0 
+  {
+ 	 VertexProgram = compile vp40 simpleVS(gWorldITXf,gworld,
+				gViewIXf,mvp,mv);
+	        DepthTestEnable = true;
+		DepthMask = true;
+		CullFaceEnable = false;
+		BlendEnable = false;
+		DepthFunc = LEqual;
+		FragmentProgram = compile fp40 geomMRT_PS(gNear,gFar);
+  }
+}
+
+technique FragmentBlinnLighting 
+{
+  pass p0 
+  {
+    VertexProgram   = compile arbvp1 vertex(mvp, mv, mvit);
+    FragmentProgram = compile arbfp1 fragment(Color/*.gbr*/);
+  }
+}
+
+technique FixedFunctionFog 
+{
+  pass p0 
+  {
+    FogEnable   = true;
+    FogMode     = Linear;
+    FogDensity  = 5.;
+    FogStart    = 0.;
+    FogEnd      = 5;
+    FogColor    = float4(.5, .5, .5, .5);
+  }
+}
+
+technique VertexProgram 
+{
+  pass p0
+  {
+      VertexProgram = compile arbvp1 vertex(mvp, mv, mvit);
+      DepthFunc     = LEqual;
+  }
+}

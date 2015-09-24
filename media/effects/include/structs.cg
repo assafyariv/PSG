@@ -1,0 +1,51 @@
+// Copyright NVIDIA Corporation 2002-2004
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+struct VS_INPUT
+{
+	float4 position   : POSITION;        // object space position
+	float4 color      : COLOR0;          // primary (diffuse) color 
+  float4 color1     : COLOR1;          // secondary (specular) color
+	float4 normal     : NORMAL;          // normal in object space
+  float4 texcoord0  : TEXCOORD0;       // texture coordinate set 0 
+  float4 texcoord1  : TEXCOORD1;       // texture coordinate set 1 
+  float4 texcoord2  : TEXCOORD2;       // texture coordinate set 2 
+  float4 texcoord3  : TEXCOORD3;       // texture coordinate set 3
+  float4 texcoord4  : TEXCOORD4;       // texture coordinate set 4 
+  float4 texcoord5  : TEXCOORD5;       // texture coordinate set 5 
+  float4 texcoord6  : TEXCOORD6;       // texture coordinate set 6 
+  float4 texcoord7  : TEXCOORD7;       // texture coordinate set 7
+};
+
+struct VS_OUTPUT
+{
+  float4 position     : POSITION;      // homogeneous clip space position 
+  float4 wposition    : WPOS;          // window position
+  float4 color        : COLOR0;        // primary (diffuse) color 
+  float4 color1       : COLOR1;        // secondary (specular) color 
+  //float  fog          : FOG;           // fog factor 
+  //float  psize        : PSIZE;         // point size 
+  float4 texcoord0    : TEXCOORD0;     // texture coordinate set 0 
+  float4 texcoord1    : TEXCOORD1;     // texture coordinate set 1 
+  float4 texcoord2    : TEXCOORD2;     // texture coordinate set 2 
+  float4 texcoord3    : TEXCOORD3;     // texture coordinate set 3 
+  float4 texcoord4    : TEXCOORD4;     // texture coordinate set 4 
+  float4 texcoord5    : TEXCOORD5;     // texture coordinate set 5 
+  float4 texcoord6    : TEXCOORD6;     // texture coordinate set 6 
+  float4 texcoord7    : TEXCOORD7;     // texture coordinate set 7 
+   float oClp          : CLP0;
+  float oClp1          : CLP1;
+};
+
+struct FRAGOUT
+{
+	float4 color        : COLOR;
+};

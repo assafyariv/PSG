@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>bedfc5ef-5f92-4721-aac8-56a0a6192440</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>a7751415-4542-4315-9f40-7cb7a273686e</UniqueIdentifier>
+    </Filter>
+    <Image Include="Assets\Logo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.png">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="SimplePixelShader.hlsl" />
+    <FxCompile Include="SimpleVertexShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinRTMinimal.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="CubeRenderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WinRTMinimal.h" />
+    <ClInclude Include="BasicTimer.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="CubeRenderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WinRTMinimal_TemporaryKey.pfx" />
+    <None Include="..\..\src\SceniXWinRT\Debug\SceniXWinRT\SceniXWinRT.dll" />
+    <None Include="..\..\src\SceniXWinRT\Release\SceniXWinRT\SceniXWinRT.dll" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,52 @@
+REGEDIT
+; This .REG file may be used by your SETUP program.
+;   If a SETUP program is not available, the entries below will be
+;   registered in your InitInstance automatically with a call to
+;   CWinApp::RegisterShellFileTypes and COleObjectFactory::UpdateRegistryAll.
+
+; private licence and langauge stuff..
+
+; LOG FILE GENERATION INSIDE APP DATA \ SESSION \ .log FILE
+; HKEY_CURRENT_USER\SOFTWARE\BexxonPrivate\TraceEnabled\DWORD = 0;
+
+; lancodes {0 - DEV , 1 - ENG , 2 - RAS}
+HKEY_CLASSES_ROOT\SOFTWARE\BexxonPrivate\LanguageCode
+
+; lic types {LIMITED - 0x8978222899, FULL - 0x1474323727} 
+HKEY_CLASSES_ROOT\SOFTWARE\BexxonPrivate\AvocadoLicence
+
+; lic period will contain the date of installation.
+HKEY_CLASSES_ROOT\SOFTWARE\BexxonPrivate\AvocadoLicencePeriod
+
+; regular MFC stuf..
+HKEY_CLASSES_ROOT\.avc = Avocado.Document
+HKEY_CLASSES_ROOT\Avocado.Document\shell\open\command = C:\Educat~1\Avocad~1\Avocado\x64\Release\Avocado.EXE %1
+HKEY_CLASSES_ROOT\Avocado.Document\shell\open\ddeexec = [open("%1")]
+HKEY_CLASSES_ROOT\Avocado.Document\shell\open\ddeexec\application = Avocado
+    ; note: the application is optional
+    ;  (it defaults to the app name in "command")
+
+HKEY_CLASSES_ROOT\Avocado.Document = Avocado.Document
+
+; OLE active doc stuff copied from pdf / excel ..
+HKEY_CLASSES_ROOT\Avocado.Document\EditFlags = 0x00010000
+;HKEY_CLASSES_ROOT\Avocado.Document\BrowseInPlace = 1
+;HKEY_CLASSES_ROOT\Avocado.Document\BrowseFlags = 0x00010000
+
+HKEY_CLASSES_ROOT\Avocado.Document\protocol\StdFileEditing\server = C:\Educat~1\Avocad~1\Avocado\x64\Release\Avocado.EXE
+HKEY_CLASSES_ROOT\Avocado.Document\protocol\StdFileEditing\verb\0 = &Edit
+HKEY_CLASSES_ROOT\Avocado.Document\Insertable =
+HKEY_CLASSES_ROOT\Avocado.Document\CLSID = {DA96493C-33A3-4D50-91A5-41DFF6287FBF}
+
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF} = Avocado.Document
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\DefaultIcon = C:\Educat~1\Avocad~1\Avocado\x64\Release\Avocado.EXE,1
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\LocalServer32 = C:\Educat~1\Avocad~1\Avocado\x64\Release\Avocado.EXE
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\ProgId = Avocado.Document
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\MiscStatus = 544
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\AuxUserType\3 = Avocado
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\AuxUserType\2 = Avocado
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\Insertable = 
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\verb\1 = &Open,0,2
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\verb\0 = &Edit,0,2
+HKEY_CLASSES_ROOT\CLSID\{DA96493C-33A3-4D50-91A5-41DFF6287FBF}\InprocHandler32 = ole32.dll
+

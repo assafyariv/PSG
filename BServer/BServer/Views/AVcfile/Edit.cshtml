@@ -1,0 +1,79 @@
+﻿@model BServer.Models.AVCfile
+
+@{
+    ViewBag.Title = "Edit";
+    var states = new SelectList((System.Collections.IEnumerable)ViewBag.ro, "roomId", "name");
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "AVcfile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>AVCfile</legend>
+
+        @Html.HiddenFor(model => model.id)
+         @Html.HiddenFor(model => model.productId)
+        @Html.HiddenFor(model => model.location)
+        @Html.HiddenFor(model => model.version)
+        @Html.HiddenFor(model => model.productVersion)
+  
+
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.name)
+            @Html.ValidationMessageFor(model => model.name)
+        </div>
+
+          <div class="editor-label">
+            @Html.LabelFor(model => model.productVersion)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productVersion)
+            @Html.ValidationMessageFor(model => model.productVersion)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.description)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.description, new { @class = "whatever-class", @cols = 36, @rows = 5 })
+            @Html.ValidationMessageFor(model => model.description)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.date)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.date)
+            @Html.ValidationMessageFor(model => model.date)
+        </div>
+             <div class="editor-label">
+            @Html.LabelFor(model => model.roomID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.roomID, states, new { style = "width:160px;" })   
+            @Html.ValidationMessageFor(model => model.roomID)
+        </div>
+
+         <input type="file" name="file" id="file" /> 
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to Edit Product", "Edit", "Products", new  { Pid = Model.productId },null)
+    @Html.ActionLink("Back to List", "Plist", "Products")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

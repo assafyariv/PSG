@@ -1,0 +1,423 @@
+// Copyright NVIDIA Corporation 2011
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
+
+// profile_COMMON_shadow.cgfx
+// Ueber-shader for COLLADA profile_COMMON material like definition
+// plus forward shadow mapping with custom ShadowLightSource array.
+// Used inside the QtProfileCommonShadow example.
+
+// This value must be kept in sync with the main application!
+#define NUMBER_OF_LIGHTS 3
+
+#ifndef BIT
+#define BIT(n) (1<<n)
+#endif
+
+// Bitfield encoded in "int componentState" variable by the SceniX DAELoader shader generator for the RTFx case.
+// The generated CgFX shaders are not exporting it but are optimized to the existing components!
+// The QtProfileCommonShadow example regenerates the needed flags from existing tweakables, samplers, and annotations.
+//
+// Note that this shader assumes all textures are indexed with either texcoord0 or texcoord1.
+// This normally is the case with files exported from Maya or 3ds max using OpenCOLLADA,
+// where Maya files start at texcoord0 and 3ds max at texcoord1 (because of some one-based "channel" numbering inside 3ds max).
+// It's unknown if the latter has been remapped more optimally by the OpenCOLLADA exporter in the meantime.
+
+// Note: Alternative is that the component is a color.
+#define  EMISSIVE_IS_TEXTURE        BIT(0)
+#define  AMBIENT_IS_TEXTURE         BIT(1)
+#define  DIFFUSE_IS_TEXTURE         BIT(2)
+#define  SPECULAR_IS_TEXTURE        BIT(3)
+#define  TRANSPARENT_IS_TEXTURE     BIT(4)
+#define  REFLECTIVE_IS_TEXTURE      BIT(5)
+// #define UNUSED                   BIT(6)
+// Alternative is RGB_ZERO
+#define  TRANSPARENCY_IS_ALPHA_ONE  BIT(7)
+// Light Model  // Unused, this shader always lights with the Phong model.
+#define  LIGHTING_MODEL            (BIT(9) | BIT(8))
+#define  LIGHTMODEL_CONSTANT        0
+#define  LIGHTMODEL_LAMBERT         BIT(8)
+#define  LIGHTMODEL_BLINN           BIT(9)
+#define  LIGHTMODEL_PHONG          (BIT(9) | BIT(8))
+// Enables  // This shader always uses two sided lighting, shadows, and reflections. 
+            // Bumpmap is evaluated, refractions are not implemented inside the rasterizer.
+#define  ENABLE_BUMPMAP             BIT(10)
+#define  ENABLE_TWO_SIDED           BIT(11)
+#define  ENABLE_SHADOWS             BIT(12)
+#define  ENABLE_REFLECTION          BIT(13)
+#define  ENABLE_REFRACTION          BIT(14)
+
+
+// Non-Tweakables
+
+struct NVSGScene
+{
+  float4 ambient;
+  int    frameNumber;
+};
+
+NVSGScene scene;
+
+// Light source structure tailored to this shadow mapping demo.
+struct ShadowLightSource
+{
+  float3   position;
+  float3   direction;
+  float3   ambient;
+  float3   diffuse;
+  float3   specular;
+  float3   attenuation;
+  float    cosCutoff;
+  float    exponent;
+  float4x4 matrix;    // Shadow matrix for this demo.
+};
+
+ShadowLightSource lights[NUMBER_OF_LIGHTS];
+
+// These semantics are known by SceniX and will be filled in during rendering traversal.
+float4x4 world           : WORLD;
+float4x4 view_projection : VIEWPROJECTION;
+float4x4 world_it        : WORLDINVERSETRANSPOSE;
+float4x4 view_i          : VIEWINVERSE;
+
+
+// Tweakables
+
+// The DAELoader generates the colors as float4, but the alpha component is only needed inside "transparent".
+// Save some parameter space and use float3 where possible.
+int componentState  = 0;  // Note, that means RGB_ZERO opacity is the default.
+
+float3 emissive     = float3(0.0f, 0.0f, 0.0f);
+float3 ambient      = float3(0.0f, 0.0f, 0.0f);
+float3 diffuse      = float3(0.0f, 0.0f, 0.0f);
+float3 specular     = float3(0.0f, 0.0f, 0.0f);
+float  shininess    = 1.0f;
+
+float4 transparent  = float4(0.0f, 0.0f, 0.0f, 1.0f); // Opaque for both RGB_ZERO and ALPHA_ONE opacity (latter uses alpha).
+float  transparency = 1.0f;
+
+float3 reflective   = float3(0.0f, 0.0f, 0.0f);
+float  reflectivity = 0.0f;
+
+int emissiveTexCoord = 0;
+sampler2D emissiveSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int ambientTexCoord = 0;
+sampler2D ambientSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int diffuseTexCoord = 0;
+sampler2D diffuseSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int specularTexCoord = 0;
+sampler2D specularSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int transparentTexCoord = 0;
+sampler2D transparentSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int reflectiveTexCoord = 0;
+sampler2D reflectiveSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+
+int bumpTexCoord = 0;
+sampler2D bumpSampler = sampler_state
+{
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+float bumpiness = 1.0f;
+
+
+// Shadow mapping sampler. One layer per light source.
+sampler2DARRAY shadowSampler = sampler_state 
+{
+  MagFilter = Linear;
+  MinFilter = Linear;
+  WrapS = ClampToBorder;
+  WrapT = ClampToBorder;
+  // Automatic shadow comparison.
+  // See http://http.developer.nvidia.com/Cg/tex2DARRAY.html for the operation
+  // and http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter09.html
+  // chapter 9.3 Projective Texturing for the algorithm.
+  CompareMode = CompareRToTexture;
+  CompareFunc = Less;
+};
+
+
+// Vertex attribute interface:
+struct APP2VP
+{
+  float4 position  : POSITION;
+  float3 normal    : NORMAL;
+  
+  float4 texcoord0 : TEXCOORD0;
+  float4 texcoord1 : TEXCOORD1;
+
+  float3 tangent   : TEXCOORD6;
+  float3 binormal  : TEXCOORD7;
+};
+
+// Varyings interface:
+struct VP2FP 
+{
+  float4 position   : POSITION;
+  float4 texcoord0  : TEXCOORD0;
+  float4 texcoord1  : TEXCOORD1;
+  
+  float3 normal     : TEXCOORD2;
+  float3 worldPos   : TEXCOORD3;
+  float3 eyePos     : TEXCOORD4;
+  
+  float3 tangent    : TEXCOORD6;
+  float3 binormal   : TEXCOORD7;
+};
+
+
+// VERTEX PROGRAM
+
+VP2FP vp(APP2VP IN)
+{
+  VP2FP OUT;
+
+  float4 P      = mul(world, IN.position); // position in world coordinates
+  OUT.position  = mul(view_projection, P); // position in clip space
+  OUT.texcoord0 = IN.texcoord0;            // Passthrough.
+  OUT.texcoord1 = IN.texcoord1;            // Passthrough.
+  
+  // Note that tangent and binormal are NOT multiplied with the inverse transpose, only the normal needs that!
+  OUT.tangent   = mul(world,    float4(IN.tangent, 0.0f)).xyz;
+  OUT.binormal  = mul(world,    float4(IN.binormal, 0.0f)).xyz;
+  OUT.normal    = mul(world_it, float4(IN.normal, 0.0f)).xyz;
+
+  OUT.worldPos  = P.xyz;
+  OUT.eyePos    = mul(view_i, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  
+  return OUT;
+}
+
+
+// FRAGMENT PROGRAM
+
+// COLLADA 1.4.1 definition of luminance.
+float luminance(float3 color)
+{
+  return dot(color, float3(0.212671f, 0.71516f, 0.072169));
+}
+
+// Per-light lighting calculation simplified for SpotLights.
+void sample_light(in ShadowLightSource light,
+                  in float layer, // This is an unnormalized coordinate.
+                  in float3 pos,
+                  in float3 ns,
+                  in float3 wo,
+                  in out float3 ambient,
+                  in out float3 diffuse,
+                  in out float3 specular)
+{
+  // If the shadowSampler CompareMode is None,
+  // this would be the equivalent code to the below tex2DARRAY ´() lookup with float4 parameter!
+  // 
+  // float4 lightPos = mul(light.matrix, float4(pos, 1.0f));
+  // lightPos.xyz /= lightPos.w;
+  // float zFromMap = tex2DARRAY(shadowSampler, float3(lightPos.xy, layer)).x;
+  // if (lightPos.z < zFromMap) // Doing a binary check like this would result in hard aliased shadows.
+  // { ...
+
+  float4 lightPos = mul(light.matrix, float4(pos, 1.0f));
+  lightPos.xyz /= lightPos.w;
+  // This shadow comparison result is linearly filtered on NVIDIA hardware.
+  // Using it as attenuation instead of a binary decision will generate smoother shadow edges.
+  float shadow = tex2DARRAY(shadowSampler, float4(lightPos.xy, layer, lightPos.z)).x;
+    
+  // Vector from surface point to light. (ShadowLightSource is a spot light!)
+  float3 wi = light.position.xyz - pos;
+  float dist = length(wi);
+  wi = wi / dist;  // == normalize(wi);
+  
+  float att = 1.0f / (light.attenuation.x + (light.attenuation.y + light.attenuation.z * dist) * dist);
+  float spot = max(0.0f, dot(wi, -light.direction.xyz));
+  spot = (light.cosCutoff <= spot) ? pow(spot, light.exponent) : 0.0f;
+  
+  float attenuation = att * spot * shadow;
+  ambient += attenuation * light.ambient.rgb;
+  float ns_dot_wi = max(0.0f, dot(ns, wi));
+  if (0.0f < attenuation * ns_dot_wi)
+  {
+    diffuse += (attenuation * ns_dot_wi) * light.diffuse.rgb;
+    float3 R = reflect(-wi, ns); // Phong lighting.
+    float r_dot_wo = max(0.0f, dot(R, wo)); 
+    specular += (attenuation * pow(r_dot_wo, shininess)) * light.specular.rgb;
+  }
+}
+
+
+float4 fp(VP2FP IN, float frontfacing : FACE) : COLOR
+{
+  float3 wo = normalize(IN.eyePos - IN.worldPos); // Outgoing direction (to observer).
+  float3 ns = normalize(IN.normal) * frontfacing; // Two sided lighting. frontfacing == +1 for front, -1 for back.
+
+  if (componentState & ENABLE_BUMPMAP)
+  {
+    // Slightly simplified version compared to the DAELoader generated code.
+    float2 tc = (!bumpTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    int3 texSize = tex2Dsize(bumpSampler, 0);  // tex2Dsize() requires G80 and newer hardware!
+    float2 offset = 1.0f / float2(texSize.xy);
+
+    // Central differencing, assuming greyscale height map.
+    float left   = tex2D(bumpSampler, float2(tc.x - offset.x, tc.y)).x;
+    float right  = tex2D(bumpSampler, float2(tc.x + offset.x, tc.y)).x;
+    float bottom = tex2D(bumpSampler, float2(tc.x, tc.y - offset.y)).x;
+    float top    = tex2D(bumpSampler, float2(tc.x, tc.y + offset.y)).x;
+
+    // New normal in texture space.
+    float3 nt = float3(left - right, bottom - top, 1.0f);
+    nt.xy *= bumpiness;
+    
+    // Transform new normal into world space.
+    // (Mind that this isn't guaranteed to be on the same hemisphere as the face normal.)
+    ns = nt.x * normalize(IN.tangent) + nt.y * normalize(IN.binormal) + nt.z * ns;
+  }
+
+  float3 ambientLight  = float3(0.0f);
+  float3 diffuseLight  = float3(0.0f);
+  float3 specularLight = float3(0.0f);
+
+  for (int i = 0; i < lights.length; ++i)
+  {
+    sample_light(lights[i], (float) i, IN.worldPos, ns, wo, ambientLight, diffuseLight, specularLight);
+  }
+
+
+  float3 emissiveColor = emissive;
+  if (componentState & EMISSIVE_IS_TEXTURE)
+  {
+    float2 tc = (!emissiveTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    emissiveColor = tex2D(emissiveSampler, tc).rgb;
+  }
+  float3 result = emissiveColor;
+
+  float3 ambientColor = ambient;
+  if (componentState & AMBIENT_IS_TEXTURE)
+  {
+    float2 tc = (!ambientTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    ambientColor = tex2D(ambientSampler, tc).rgb;
+  }
+  result += ambientColor * (scene.ambient.rgb + ambientLight);
+
+  float3 diffuseColor = diffuse;
+  if (componentState & DIFFUSE_IS_TEXTURE)   
+  {
+    float2 tc = (!diffuseTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    diffuseColor = tex2D(diffuseSampler, tc).rgb;
+  }
+  result += diffuseColor * diffuseLight;
+  
+  float3 specularColor = specular;
+  if (componentState & DIFFUSE_IS_TEXTURE)   
+  {
+    float2 tc = (!specularTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    specularColor = tex2D(specularSampler, tc).rgb;
+  }
+  result += specularColor * specularLight; 
+
+  float3 reflectiveColor = reflective;
+  if (componentState & REFLECTIVE_IS_TEXTURE)
+  {
+    float2 tc = (!reflectiveTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    reflectiveColor = tex2D(reflectiveSampler, tc).rgb;
+  }
+  result += reflectiveColor * reflectivity;
+
+
+  float4 transparentColor = transparent;
+  if (componentState & TRANSPARENT_IS_TEXTURE)
+  {
+    float2 tc = (!transparentTexCoord) ? IN.texcoord0.xy : IN.texcoord1.xy;
+    transparentColor = tex2D(transparentSampler, tc);
+  }
+  
+  float alpha = 1.0f - luminance(transparentColor.rgb) * transparency;  // RGB_ZERO opacity
+  if (componentState & TRANSPARENCY_IS_ALPHA_ONE)
+  {
+    alpha = transparentColor.a * transparency;  // ALPHA_ONE opacity
+  }
+
+  return float4(result, alpha);
+}
+
+// CullFaceEnable = false because of two sided lighting.
+technique phong_opaque
+{
+  pass opaque
+  {
+    CullFaceEnable = false;
+    
+    VertexProgram   = compile latest vp();
+    FragmentProgram = compile latest fp();
+  }
+}
+
+technique phong_transparent
+{
+  pass transparent
+  {
+    AlphaFunc       = float2(Greater, 0.0);
+    AlphaTestEnable = true;
+    BlendFunc   = int2(SrcAlpha, OneMinusSrcAlpha);
+    BlendEnable = true;
+    CullFaceEnable = false;
+    
+    VertexProgram   = compile latest vp();
+    FragmentProgram = compile latest fp();
+  }
+}

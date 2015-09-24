@@ -1,0 +1,84 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+
+@{
+    ViewBag.Title = "FullDetails";
+}
+
+<h2>Details:</h2>
+<fieldset>
+<div class="display-label">
+         @Html.DisplayNameFor(model => model.productName):
+
+        @Html.DisplayFor(model => model.productName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.date):
+   
+        @Html.DisplayFor(model => model.date)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.version):
+  
+        @Html.DisplayFor(model => model.version)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.description):
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.description)
+    </div>
+</fieldset>
+
+<h3>Publications:</h3>
+
+<table  class  = "altrowstable" >
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.productName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.version)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.date)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.Publications)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.version)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.date)
+        </td>
+          <td>
+            @Html.ActionLink("Edit", "Edit", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Details", "Details", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Delete", "Delete", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Download", "Download", "AVcfile", new { id = item.id }, null) 
+
+        </td>
+    </tr>
+}
+</table>
+
+<div>
+ @Html.ActionLink("Back to List", "Plist")
+ </div>

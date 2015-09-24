@@ -1,0 +1,596 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+
+@{
+    Layout = null;
+    ViewBag.Title = "Index";
+    //Model.Count<
+}
+
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+	
+    	  <style type ="text/css">
+			body {
+				background:#000;
+				color:#000;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:monospace;
+				font-size:13px;
+				text-align:center;
+			}
+			a { color:skyblue }
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #fff;
+				background:rgba(0,0,0,0.65);
+				padding: 0px;
+				margin:0;
+				text-align: left;
+				z-index:1000;
+				display:block;
+			}
+				#infoL {
+				position: absolute;
+				top:0px; width: 10%;
+				left: 10%;
+				color: #fff;
+				background:rgba(0,0,0,0.65);
+				padding: 0px;
+				margin:0;
+				text-align: left;
+				z-index:1000;
+				display:block;
+			}
+
+		</style>
+	</head>
+<body>
+ @Scripts.Render("~/bundles/Three")
+       @Scripts.Render("~/bundles/ThreeJS")
+        @Scripts.Render("~/bundles/Text")
+         @Styles.Render("~/Content/themes/base/css", "~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+
+              
+             <div id="info">
+
+           <iframe src= "@Url.Content("~/Products/ToolBar/" + Model.productID)" 
+                scrolling="no"
+             width="99%" height="33px" frameborder="0" style="float: left; margin-left: 0em;">
+             </iframe>
+
+               
+             
+               <div class="infoL">
+                  <p class="site-title"> <a href="@Url.Action("Index", "Home")"><img src="@Url.Content("~/Images/logo.jpg")" /></a></p>
+                </div>
+
+            </div>
+
+        @{/*
+                  @Styles.Render("~/Content/themes/base/css", "~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+        <div id="info">
+            <div class="content-wrapper">
+                <div class="float-left">
+                  <p class="site-title"> <a href="@Url.Action("Index", "Home")"><img src="@Url.Content("~/Images/logo.jpg")"/></a></p>
+                </div>
+                <div class="float-right">
+                    
+                        <ul id="menu">
+                           <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                           <li>@Html.ActionLink("About", "About", "Home")</li>
+                          <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                           <li>@Html.ActionLink("Products", "Index")</li>
+                           <li>@Html.ActionLink("Back to Product", "Details", new { id = Model.productID })</li>
+                            <li><a onclick=ddd() style="cursor:pointer">3D</a></li>
+                        </ul>
+                    
+                </div>
+            </div>
+ </div>
+ */
+        }
+
+    	<div id="container"></div>
+       <div id="loading"><br />@Html.DisplayFor(model => model.productName)  Loading...  </div>
+	<script type="text/javascript">
+
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+			var FLOOR = -250;
+
+			var container, stats;
+
+			var camera, scene, controls;
+			var renderer, effect;
+            var isEffect = false;
+
+			var mesh;
+
+			var textureCube;
+			var cameraCube, sceneCube;
+
+			var loader;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+            var mDiv;
+
+			init();
+			animate();
+
+           
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera.position.set( 185, 40, 170 );
+				scene.add( camera );
+
+				controls = new THREE.TrackballControls3( camera );
+				controls.dynamicDampingFactor = 0.25;
+                //controls.noPan = true;
+
+
+				// SKYBOX
+
+				sceneCube = new THREE.Scene();
+				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				sceneCube.add( cameraCube );
+
+				var r = '@Model.proom.location' + "/";  //"/BServer/Content/Romms/sky/sky/";
+				var urls = [ r + "px.jpg", r + "nx.jpg",
+							 r + "py.jpg", r + "ny.jpg",
+							 r + "pz.jpg", r + "nz.jpg" ];
+
+
+				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
+
+				var material = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
+				mesh.flipSided = true;
+				sceneCube.add( mesh );
+
+				// LIGHTS
+
+                   var light = new THREE.DirectionalLight(0x666666, 2);
+	        light.position.set(1, 1, 1).normalize();
+            light.castShadow = true;
+	        scene.add(light);
+
+            THREE.ColorUtils.adjustHSV( light.color, 0, -0.75, 0 );
+
+	        var light = new THREE.DirectionalLight(0x555555);
+	        light.position.set(-1, -1, -1).normalize();
+            light.castShadow = true;
+	        scene.add(light);
+
+		     var plight = new THREE.PointLight( 0xffffff, 1 );
+			plight.position.set( 2, 5, 1 );
+			plight.position.multiplyScalar( 30 );
+               plight.castShadow = false;
+
+	        plight.shadowCameraNear = 700;
+	        plight.shadowCameraFar = camera.far;
+	        plight.shadowCameraFov = 50;
+
+	        plight.shadowCameraVisible = true;
+
+	        plight.shadowBias = 0.0001;
+	        plight.shadowDarkness = 0.5;
+
+	        plight.shadowMapWidth = 2048;
+	        plight.shadowMapHeight = 1024;
+			scene.add( plight );
+            
+				
+
+			//	var light = new THREE.PointLight( 0xffffff, 0.75 );
+		//		light.position.set( -12, 4.6, 2.4 );
+		//		light.position.multiplyScalar( 30 );
+         //             light.castShadow = true;
+		//		scene.add( light );
+
+				THREE.ColorUtils.adjustHSV( light.color, 0, -0.5, 0 );
+
+				scene.add( new THREE.AmbientLight( 0x020202 ) );
+                //GROUND
+                   var geometry = new THREE.PlaneGeometry(100, 100);
+	        var planeMaterial = new THREE.MeshPhongMaterial({ color: 0x313131 });
+	      //  THREE.ColorUtils.adjustHSV(planeMaterial.color, 0, 0, 0.9);
+	        planeMaterial.ambient = planeMaterial.color;
+
+	        var ground = new THREE.Mesh(geometry, planeMaterial);
+
+	        ground.position.set(0, 0,0);//FLOOR, 0);
+	        ground.scale.set(100, 100, 100);
+
+	        ground.castShadow = false;
+	        ground.receiveShadow = true;
+
+	        // skip floor for now 
+              if ('@Model.productName' == ("Audi-A7"))
+                scene.add(ground);
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff, clearAlpha: 1 } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+
+				renderer.autoClear = false;
+                //  renderer.shadowMapEnabled = true;
+                //  renderer.shadowMapSoft = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				// STATS
+
+			/*	stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '5px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+                */
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+            //    document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+			//	document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				// LOADER
+
+				var start = Date.now();
+
+				// classic way via BinaryLoader
+                   @{string modelPath = "/BServer/" + Model.mainPubLocation + "/modeltop.js";}
+
+				loader = new THREE.JSONLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				var callbackScene   = function( geometry ) {
+
+                waitFor(true);
+					createScene( geometry,  0, 0, 0, 30 );
+
+					var end = Date.now();
+
+                  waitFor(true);
+					console.log( "load time:", end - start, "ms" );
+
+				};
+
+				loader.load('@modelPath', callbackScene );
+
+
+				// new way via CTMLoader and separate parts
+                
+	      //  var loader = new THREE.JSONLoader();
+ /*    
+         
+				var useWorker = true,
+					useBuffers = true;
+
+				loaderCTM = new THREE.CTMLoader( renderer.context, true );
+				document.body.appendChild( loaderCTM.statusDomElement );
+
+				var position = new THREE.Vector3( -105, -78, -40 );
+				var scale = new THREE.Vector3( 30, 30, 30 );
+
+				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+
+					hackMaterials( materials );
+
+					for ( var i = 0; i < geometries.length; i ++ ) {
+
+						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
+						mesh.position = position;
+						mesh.scale = scale;
+						mesh.doubleSided = true;
+						scene.add( mesh );
+
+					}
+
+					loaderCTM.statusDomElement.style.display = "none";
+
+					var end = Date.now();
+
+					console.log( "load time:", end - start, "ms" );
+
+				}, useWorker, useBuffers );
+                */
+
+                effect = new THREE.AnaglyphEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+            function waitFor(wait)
+            {
+              if(wait){
+              document.getElementById("loading").style.display = "none";
+              //document.getElementById("content").style.display = "block";
+              }else{
+              
+              }
+
+            }
+
+			function hackMaterials( materials ) {
+
+				for ( var i = 0; i < materials.length; i ++ ) {
+
+					var m = materials[ i ];
+
+					if ( m.name.indexOf( "Body" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.combine = THREE.MixOperation;
+						mm.reflectivity = 0.75;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.combine = THREE.MultiplyOperation;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.envMap = textureCube;
+						mm.color.copy( m.color );
+						mm.combine = THREE.MixOperation;
+						mm.reflectivity = 0.25;
+						mm.opacity = m.opacity;
+						mm.transparent = true;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "Material.001" ) !== -1 ) {
+
+						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+
+						mm.shininess = 30;
+						mm.color.setHex( 0x404040 );
+						mm.metal = true;
+						mm.perPixel = true;
+
+						materials[ i ] = mm;
+
+					}
+
+				}
+
+			}
+
+			//
+
+			function createScene( geometry, x, y, z, s ) {
+
+				loader.statusDomElement.style.display = "none";
+
+				//THREE.GeometryUtils.center( geometry );
+				//hackMaterials( geometry.materials );
+
+				//var material = new THREE.MeshFaceMaterial();
+
+              //  for (var i =0 ; i<geometry.materials.length; i++)
+               // console.log(geometry.materials[i].name);
+             
+              if(geometry.materials.length == 15)
+              {
+               geometry.materials[9] =  new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ;
+                  geometry.materials[12] = new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true } );
+               geometry.materials[11] = new THREE.MeshLambertMaterial( { color: 0x226699, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ;
+             //   geometry.materials[1] = new THREE.MeshBasicMaterial({ color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true }); 
+             }
+             
+             mat = new MatLib();
+             
+             if ('@Model.productName' == ("Casio Fishing Watch"))
+             {
+            for(var u=0; u< geometry.materials.length-60; u++){
+             m = geometry.materials[u] ;
+               m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;
+            // geometry.materials[u] =  mat.mlib["Chrome"];
+             }
+             }
+               if ('@Model.productName' == ("Audi-A7"))
+             {
+            for(var u=0; u< geometry.materials.length; u++){
+               m = geometry.materials[u] ;
+               //m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;
+               r = m.color & 0xff0000 / 256.0;
+               r = r/256.0;
+               g = m.color & 0x00ff00 / 256.0;
+               b = m.color & 0x0000ff;
+               // 0 is front (audi logo) and side metal.
+               // 1 is headlights
+               // 2 is backlights
+               // 3 is side door mirror
+               // 4 is windoes
+               // 5 is black plastic.
+               // 6 is interior
+               // 7 is the body.
+               // 8 is tires.
+               // 9 is rimms.
+               // 10 is innter wheel plates.
+
+               //if (u == 0)
+                 //geometry.materials[u] = new THREE.MeshLambertMaterial( { color: 0xff0000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ;
+                   if (u == 1)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0x999999, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3, opacity: 0.5, transparent: true  });
+				        if (u == 4)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0x335533, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3, opacity: 0.5, transparent: true });
+				      
+				        if (u == 0)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0x999999, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 });
+				        if (u == 5)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0x020202, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.05 });
+				        if (u == 9)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0x888888, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 });
+				        if (u == 7)
+				            geometry.materials[u] = new THREE.MeshLambertMaterial({ color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 });
+             }
+             // geometry.materials[4] = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ;
+           
+          //   m = geometry.materials[4] ;
+            //   m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;
+            // geometry.materials[u] =  mat.mlib["Chrome"];
+        
+             }
+             if ('@Model.productName' == ("Seiko Watch Classic View"))
+             {
+            for(var u=0; u< geometry.materials.length-55; u++){
+             m = geometry.materials[u] ;
+               m.shininess=10; m.envMap=textureCube; m.combine= THREE.MultiplyOperation;//mat.mlib["Gold"];
+               m.specular=0xffffff;
+             }
+             }
+             
+
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+                
+				mesh.position.set( x, y+14,z);// + ((geometry.boundingBox.min.y - geometry.boundingBox.max.y) / 2.0));
+				//mesh.scale.set( 1, 1, 1 );
+
+
+                 sf = 50 / mesh.boundRadius;
+
+	        mesh.scale.x *= sf;
+	        mesh.scale.y *= sf;
+	        mesh.scale.z *= sf;
+            mesh.rotation.x = -1.57;
+            mesh.rotation.y = 0;
+            mesh.rotation.z = 0;
+            mesh.doubleSided = false;
+            if ('@Model.productName' == ("Audi-A7"))
+                mesh.doubleSided = true;
+                
+                mesh.castShadow = true;
+	            mesh.receiveShadow = true;
+				//mesh.doubleSided = true;
+				scene.add( mesh );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraCube.updateProjectionMatrix();
+
+                effect.setSize( window.innerWidth, window.innerHeight );
+			}
+
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+
+            function ddd() {isEffect = !isEffect;}
+
+
+
+ 
+
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				//stats.update();
+
+			}
+
+			function render() {
+
+				controls.update();
+
+				cameraCube.rotation.copy( camera.rotation );
+
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
+
+                if(isEffect)
+                {
+                 effect.render( sceneCube, cameraCube );
+                 effect.render( scene, camera );
+                 }
+
+			}
+            			</script>
+</body>
+		

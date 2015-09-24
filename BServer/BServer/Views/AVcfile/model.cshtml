@@ -1,0 +1,301 @@
+﻿@model BServer.Models.AVCfile
+
+@{
+    Layout = null;
+    string modelPath = "../../" + Model.location + "/modeltop.js";
+}
+
+
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+	</head>
+<body>
+
+ @Scripts.Render("~/bundles/Three")
+ @Scripts.Render("~/bundles/ThreeJS")
+ @Scripts.Render("~/bundles/Threex")
+  @Styles.Render("~/Content/css")
+
+ 
+	<!-- three.js container -->
+    <div id="container"></div>
+     <div id="loading"><br />@Html.DisplayFor(model => model.name)  Loading...  </div>
+	
+
+	<script type="text/javascript">
+	    var stats, scene, renderer, domEvent;
+	    var camera, cameraControl;
+	    var mouse = { x: 0, y: 0 };
+	    var mouseX = 0, mouseY = 0;
+	    var theta = 0.0;
+	    var r = 0.0;
+	    var windowHalfX = window.innerWidth / 2;
+	    var windowHalfY = window.innerHeight / 2;
+	    var move = true;
+
+
+
+	    if (!init()) animate();
+
+	    // init the scene
+	    function init() {
+
+	        if (Detector.webgl) {
+	            renderer = new THREE.WebGLRenderer({
+	                antialias: true, // to get smoother output
+	                preserveDrawingBuffer: true	// to allow screenshot
+	            });
+	            renderer.setClearColorHex(0xBBBBBB, 1);
+	        } else {
+	            Detector.addGetWebGLMessage();
+	            return true;
+	        }
+	        renderer.setSize(window.innerWidth, window.innerHeight);
+	        document.getElementById('container').appendChild(renderer.domElement);
+
+	        /* add Stats.js - https://github.com/mrdoob/stats.js
+	        stats = new Stats();
+	        stats.domElement.style.position = 'absolute';
+	        stats.domElement.style.bottom = '0px';
+	        //   document.body.appendChild(stats.domElement);
+	        */
+
+	        // create a scene
+	        scene = new THREE.Scene();
+
+	        var light = new THREE.DirectionalLight(0xffffff, 2);
+	        light.position.set(1, 1, 1).normalize();
+	        scene.add(light);
+
+	        var light = new THREE.DirectionalLight(0xffffff);
+	        light.position.set(-1, -1, -1).normalize();
+	        scene.add(light);
+
+	        // put a camera in the scene
+	        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+
+	        camera.position.set(0, 1, 15);
+	        scene.add(camera);
+
+	        // create a camera contol
+	        cameraControls = new THREE.TrackballControls3(camera);
+	        cameraControls.dynamicDampingFactor = 0.25;
+
+	        // transparently support window resize
+	        THREEx.WindowResize.bind(renderer, camera);
+	        // allow 'p' to make screenshot
+	        THREEx.Screenshot.bindKey(renderer);
+	        // allow 'f' to go fullscreen where this feature is supported
+	        if (THREEx.FullScreen.available()) {
+	            THREEx.FullScreen.bindKey();
+	            //document.getElementById('inlineDoc').innerHTML += "- <i>f</i> for fullscreen";
+	        }
+
+	        // here you add your objects
+	        // - you will most likely replace this part by your own
+
+	        THREE.Object3D._threexDomEvent.camera(camera);
+	        var colo = parent.getFirstBC();
+	        setBColor(colo);
+
+	        new THREE.JSONLoader().load('@modelPath', function (geometry) {
+	            waitFor();
+	            var meshes = buildMeshes(geometry);
+	            // bindEvents(meshes);
+	            //../Scripts/threex/examples/threex.domevent/models/teapot.js
+	        });
+	        waitFor();
+
+	        THREE.Object3D._threexDomEvent.camera(camera);
+	      //  document.addEventListener('mousemove', onDocumentMouseMove, false);
+	        //  document.addEventListener('click', onDocumentMouseclick, false);
+	       // document.addEventListener('dblclick', onDocumentMousebdclick, false);
+	    }
+
+
+	    function waitFor() {
+	            document.getElementById("loading").style.display = "none";
+	        }
+
+	    function setBColor(color) { renderer.setClearColorHex(color, 1); }
+
+	    function onDocumentMousebdclick() {
+	        move = !move;
+	        // if (!move)
+	        //     document.removeEventListener('mousemove', onDocumentMouseMove, false);
+	        // else
+	        //   document.addEventListener('mousemove', onDocumentMouseMove, false);
+	    }
+
+	    function bindEvents(meshes) {
+	        // meshes['sphere2'].children.length .children[2]
+	        meshes['sphere2'].on('click', function (event) {
+	            document.add
+	            var object3d = event.target;
+	            var scale = 1.4;
+	            new TWEEN.Tween(object3d.scale)
+					.to({ x: scale, y: scale, z: scale }, 100)
+					.easing(TWEEN.Easing.Quartic.EaseIn)
+					.start();
+	            //new TWEEN.Tween(object3d.material.color)
+	            //.to({ r: 1, g: 0.5, b: 0 }, 100)
+	            //.easing(TWEEN.Easing.Quartic.EaseIn)
+	            //.start();
+	            //    }).on('mouseup', function (event) {
+	            //      var object3d = event.target;
+	            //    var scale = 1;
+	            //    new TWEEN.Tween(object3d.scale)
+	            //	.to({ x: scale, y: scale, z: scale }, 300)
+	            //	.easing(TWEEN.Easing.Quartic.EaseIn)
+	            //.start();
+	            //new TWEEN.Tween(object3d.material.color)
+	            //.to({ r: 0.5, g: 0.75, b: 0.25 }, 300)
+	            //.easing(TWEEN.Easing.Quartic.EaseIn)
+	            //.start();
+	        });
+	        /*   meshes['sphere1'].on('click', function (event) {
+	        var object3d = event.target;
+	        if (object3d.rotation.x < Math.PI / 4) {
+	        var rotation = { x: Math.PI / 2 };
+	        var color = { r: 1, g: 0.5, b: 0 };
+	        } else {
+	        var rotation = { x: 0 };
+	        var color = { r: 0.5, g: 0.75, b: 0.25 };
+	        }
+	        new TWEEN.Tween(object3d.rotation).to(rotation, 800)
+	        .easing(TWEEN.Easing.Bounce.EaseOut).start();
+	        // new TWEEN.Tween(object3d.material.color).to(color, 300)
+	        //	.easing(TWEEN.Easing.Quartic.EaseIn).start();
+	        });
+
+	        meshes['sphere3'].on('mouseover', function (event) {
+	        var object3d = event.target;
+	        new TWEEN.Tween(object3d.scale)
+	        .to({ x: 1.5, y: 1.5, z: 1.5 }, 200)
+	        .easing(TWEEN.Easing.Quartic.EaseIn)
+	        .start();
+	        //new TWEEN.Tween(object3d.material.color)
+	        //.to({ r: 1, g: 0.5, b: 0 }, 600)
+	        //.delay(400)
+	        //.easing(TWEEN.Easing.Quartic.EaseIn)
+	        //.start();
+	        new TWEEN.Tween(object3d.rotation)
+	        .to({ y: 3 * Math.PI }, 1000)
+	        .easing(TWEEN.Easing.Quartic.EaseIn)
+	        .start();
+	        }).on('mouseout', function (event) {
+	        var object3d = event.target;
+	        new TWEEN.Tween(object3d.scale)
+	        .to({ x: 1, y: 1, z: 1 }, 300)
+	        .easing(TWEEN.Easing.Quartic.EaseOut)
+	        .start();
+	        //new TWEEN.Tween(object3d.material.color)
+	        //.to({ r: 0.5, g: 0.75, b: 0.25 }, 600)
+	        //.delay(400)
+	        //.easing(TWEEN.Easing.Quartic.EaseOut)
+	        //.start();
+	        new TWEEN.Tween(object3d.rotation)
+	        .to({ y: Math.PI }, 1000)
+	        .easing(TWEEN.Easing.Quartic.EaseOut)
+	        .start();
+	        });
+	        */
+	    }
+	    function scaleIt(event) {
+	        mesh = event.target;
+	       // mesh.scale.x += 2;
+	    }
+	    function buildMeshes(geometry) {
+	        var meshes = {};
+	        var dx = 4;
+	        var dy = 2;
+	        //  var material = new THREE.MeshLambertMaterial({ color: 0xFF8800 });
+	        //     var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+	        //     mesh.position.set(0, dy, 0);
+	        //    mesh.rotation.x = +1 * Math.PI / 2;
+	        //   mesh.rotation.y = -1 * Math.PI / 2;
+	        //    scene.add(mesh);
+	        //   meshes['sphere1'] = mesh;
+
+	        //  var material = new THREE.MeshLambertMaterial({ color: 0x88CC44 });
+	        var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+	        mesh.position.set(dx, -dy, 0);
+	        scene.add(mesh);
+
+	        sf = 10 / mesh.boundRadius;
+
+	        mesh.scale.x *= sf;
+	        mesh.scale.y *= sf;
+	        mesh.scale.z *= sf;
+	        mesh.on('click', scaleIt);
+
+	        //  mesh.children[2].on('click', scaleIt);
+	        //getChildByName( 'ID226', true ).on('click', scaleIt);
+
+	        // mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
+	        meshes['sphere2'] = mesh;
+
+	        //var material = new THREE.MeshLambertMaterial({ color: 0x88CC44 });
+	        // var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+	        // mesh.position.set(dx, -dy, 0);
+	        // mesh.rotation.y = Math.PI;
+	        //  scene.add(mesh);
+	        //   meshes['sphere3'] = mesh;
+	        //*/
+	        return meshes;
+	    }
+
+	    function onDocumentMouseMove(event) {
+	        mouseX = (event.clientX - windowHalfX) * 1;
+	        mouseY = (event.clientY - windowHalfY) * 2;
+	    }
+
+
+	    // animation loop
+	    function animate() {
+
+	        // upate tween
+	        TWEEN.update();
+
+	        // loop on request animation loop
+	        // - it has to be at the begining of the function
+	        // - see details at http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+	        requestAnimationFrame(animate);
+
+	        // do the render
+	        render();
+
+	        // update stats
+	        // stats.update();
+	    }
+
+	    // render the scene
+	    function render() {
+
+	        // update camera controls
+	        cameraControls.update();
+
+
+	       /* if (move == true) {
+	            r = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+	            camera.position.x = r * Math.cos(theta);
+	            camera.position.y = r * Math.sin(theta / 4);
+	            camera.position.z = r * Math.sin(theta);
+	        } else {
+	            camera.position.x += (mouseX - camera.position.x) * 0.01;
+	            camera.position.y += (-mouseY - camera.position.y) * 0.01;
+	        }
+            */
+	        theta += 0.01;
+	        camera.lookAt(scene.position);
+	        // actually render the scene
+	        renderer.render(scene, camera);
+	    }
+	</script>
+</body>
+</html>
+

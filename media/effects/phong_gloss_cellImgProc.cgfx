@@ -1,0 +1,221 @@
+// Copyright NVIDIA Corporation 2002-2005
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+#include "include/Quad.cgh"
+
+float2 QuadScreenSize2 = {1000.0,1000.0};
+float gNPixels <
+    string UIName = "Edge Pixels Steps";
+    string UIWidget = "slider";
+    float UIMin = 1.0f;
+    float UIMax = 5.0f;
+    float UIStep = 0.5f;
+> = 1.0f;
+
+float gThreshhold <
+    string UIName = "Edge Threshhold";
+    string UIWidget = "slider";
+    float UIMin = 0.001f;
+    float UIMax = 0.1f;
+    float UIStep = 0.001f;
+> = 0.005;
+
+float gThreshholdD <
+    string UIName = "Depth Threshhold";
+    string UIWidget = "slider";
+    float UIMin = 0.0001f;
+    float UIMax = 0.1f;
+    float UIStep = 0.0001f;
+> = 0.005212;
+
+//texture gNormTexture ;
+//texture gDeepTexture ;
+samplerRECT gNormSampler : RT0_COLOR_ATTACHMENT0 = sampler_state { MagFilter = Nearest; MinFilter = Nearest; };
+samplerRECT gDeepSampler : RT0_COLOR_ATTACHMENT1 = sampler_state { MagFilter = Nearest; MinFilter = Nearest; };
+
+//samplerRECT gNormSampler = sampler_state
+//{
+ //   Texture = <gNormTexture>;
+ //   WrapS = ClampToEdge; 
+ //   WrapT = ClampToEdge; 
+ //   MagFilter = Linear; 
+  //  MinFilter = Linear; 
+ //   MipFilter = Point;
+////////};
+//samplerRECT gDeepSampler = sampler_state
+//{
+//  Texture = <gDeepTexture>;
+ // WrapS = ClampToEdge; 
+ //   WrapT = ClampToEdge;
+  //  MagFilter = Linear; 
+  //  MinFilter = Linear; 
+  //  MipFilter = Point;
+//};
+
+//DECLARE_QUAD_TEX(gNormTexture,gNormSampler,"X8R8G8B8")
+//DECLARE_QUAD_TEX(gDeepTexture,gDeepSampler,"X8R8G8B8")
+
+
+// packing macros
+#define UV00 TC00.xy
+#define UV01 TC00.zw
+#define UV02 TC01.xy
+#define UV10 TC01.zw
+#define UV11 TC02.xy
+#define UV12 TC02.zw
+#define UV20 TC03.xy
+#define UV21 TC03.zw
+#define UV22 TC04.xy
+
+struct EdgeVertexOutput
+{
+    QUAD_REAL4 Position	: POSITION;
+    QUAD_REAL4 TC00	: TEXCOORD0; // packed
+    QUAD_REAL4 TC01	: TEXCOORD1; // packed
+    QUAD_REAL4 TC02	: TEXCOORD2; // packed
+    QUAD_REAL4 TC03	: TEXCOORD3; // packed
+    QUAD_REAL2 TC04	: TEXCOORD4; // not packed
+};
+
+
+EdgeVertexOutput edgeVS(
+		QUAD_REAL3 Position : POSITION, 
+		QUAD_REAL3 TexCoord : TEXCOORD1,
+		uniform float2 ScreenSize,
+		uniform float NPixels
+) {
+    EdgeVertexOutput OUT = (EdgeVertexOutput)0;
+    OUT.Position = QUAD_REAL4(Position, 1);
+    QUAD_REAL2 ctr = QUAD_REAL2(TexCoord.xy); 
+    QUAD_REAL2 ox = QUAD_REAL2(1.1,0.0);//NPixels/ScreenSize.x
+    QUAD_REAL2 oy = QUAD_REAL2(0.0,1.1);//NPixels/ScreenSize.y
+    OUT.UV00 = ctr - ox - oy;
+    OUT.UV01 = ctr - oy;
+    OUT.UV02 = ctr + ox - oy;
+    OUT.UV10 = ctr - ox;
+    OUT.UV11 = ctr;
+    OUT.UV12 = ctr + ox;
+    OUT.UV20 = ctr - ox + oy;
+    OUT.UV21 = ctr + oy;
+    OUT.UV22 = ctr + ox + oy;
+    return OUT;
+}
+
+QUAD_REAL getGray(QUAD_REAL4 c)
+{
+    return(dot(c.rgb,((0.33333).xxx)));
+}
+
+QUAD_REAL edgeDetectGray(EdgeVertexOutput IN,
+						 uniform samplerRECT ColorMap,
+						 uniform QUAD_REAL T2) {
+	QUAD_REAL4 CC;
+	CC = texRECT(ColorMap,IN.UV00); QUAD_REAL g00 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV01); QUAD_REAL g01 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV02); QUAD_REAL g02 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV10); QUAD_REAL g10 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV12); QUAD_REAL g12 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV20); QUAD_REAL g20 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV21); QUAD_REAL g21 = getGray(CC);
+	CC = texRECT(ColorMap,IN.UV22); QUAD_REAL g22 = getGray(CC);
+	QUAD_REAL sx = 0;
+	sx -= g00;
+	sx -= g01 * 2;
+	sx -= g02;
+	sx += g20;
+	sx += g21 * 2;
+	sx += g22;
+	QUAD_REAL sy = 0;
+	sy -= g00;
+	sy += g02;
+	sy -= g10 * 2;
+	sy += g12 * 2;
+	sy -= g20;
+	sy += g22;
+	QUAD_REAL dist = (sx*sx+sy*sy);
+	QUAD_REAL result = 0;
+	if (dist>T2) { result = 1; }
+	return  result;
+}
+
+//
+// Only the red channel since the image is grayscale already
+//
+QUAD_REAL edgeDetectR(EdgeVertexOutput IN,
+						 uniform samplerRECT ColorMap,
+						 uniform QUAD_REAL T2) {
+	QUAD_REAL4 CC;
+	QUAD_REAL g00 = texRECT(ColorMap,IN.UV00).x;
+	QUAD_REAL g01 = texRECT(ColorMap,IN.UV01).x;
+	QUAD_REAL g02 = texRECT(ColorMap,IN.UV02).x;
+	QUAD_REAL g10 = texRECT(ColorMap,IN.UV10).x;
+	QUAD_REAL g12 = texRECT(ColorMap,IN.UV12).x;
+	QUAD_REAL g20 = texRECT(ColorMap,IN.UV20).x;
+	QUAD_REAL g21 = texRECT(ColorMap,IN.UV21).x;
+	QUAD_REAL g22 = texRECT(ColorMap,IN.UV22).x;
+	QUAD_REAL sx = 0;
+	sx -= g00;
+	sx -= g01 * 2;
+	sx -= g02;
+	sx += g20;
+	sx += g21 * 2;
+	sx += g22;
+	QUAD_REAL sy = 0;
+	sy -= g00;
+	sy += g02;
+	sy -= g10 * 2;
+	sy += g12 * 2;
+	sy -= g20;
+	sy += g22;
+	QUAD_REAL dist = (sx*sx+sy*sy);
+	QUAD_REAL result = 0;
+	if (dist>T2) { result = 1; }
+	return result;
+}
+
+///////
+
+QUAD_REAL4 edgeDetect2PS(EdgeVertexOutput IN,
+		    uniform samplerRECT NormSampler,
+		    uniform samplerRECT DeepSampler,
+		    uniform float Threshhold,
+		    uniform float ThreshholdD
+) : COLOR {
+    float EdgeT2 = (Threshhold * Threshhold);
+    float DeepT2 = (ThreshholdD * ThreshholdD);
+    QUAD_REAL n = edgeDetectGray(IN,NormSampler,EdgeT2);
+    QUAD_REAL d = edgeDetectR(IN,DeepSampler,DeepT2);
+    QUAD_REAL ink =  1 - ((n*d) + n*0.43);
+float opac = 0.0;
+if (ink < 1.0)
+    opac = 1.0f;
+    //return float4(texRECT(DeepSampler,IN.UV11).xyz,1);//ink.xxxx;
+    return float4(ink.xxx,opac);
+}
+technique Main
+{
+  pass p0 
+  {
+ 	
+		VertexProgram = compile vp30 edgeVS(QuadScreenSize2,gNPixels);
+		    DepthTestEnable = false;
+		DepthMask = false;
+		BlendEnable = true;
+  		AlphaFunc = { Greater, 0.0f };
+  		 AlphaTestEnable = true;
+		CullFaceEnable = false;
+		DepthFunc = LEqual;
+		FragmentProgram = compile fp30 edgeDetect2PS(gNormSampler,
+							    gDeepSampler,
+							    gThreshhold,gThreshholdD);
+  }
+}
+

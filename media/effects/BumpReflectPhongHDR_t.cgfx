@@ -1,0 +1,560 @@
+// Copyright NVIDIA Corporation 2002-2005
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+// un-tweakables
+
+#include "include/matrices.cg"
+#include "include/structs.cg"
+#include "include/textureHDR_RGBA.cg"
+#include "include/NVSGLight.cg"
+#include "include/NVSGMaterial.cg"
+#include "include/NVSGScene.cg"
+#include "include/phongLightingTor.cg"
+
+
+float4x4 worldViewProj : WorldViewProjection; // model to clip
+float4x4 world         : World;   // model to world
+float4x4 worldIT       : WorldIT; // model to world
+float4x4 worldI       : WorldI; // model to world
+float4x4 viewI         : ViewI;   // view to world 
+
+float4x4 worldViewMatrix    : WorldView;
+float4x4 worldViewMatrixI   : WorldViewI;
+float4x4 viewInverseMatrix  : ViewIT;
+float4x4 viewMatrix         : View;
+
+// gloabal ambiel term
+//float4 gAmbient = {1.0,1.0,1.0,1.0} ;//: GlobalAmbient;
+float indexOfRefraction = 0.0;
+
+NVSGLight     light[8];
+NVSGMaterial  material;
+NVSGScene scene;
+
+#ifndef ddx_arb
+#define ddx_arb ddx
+#endif
+#ifndef ddy_arb
+#define ddy_arb ddy
+#endif
+
+float4 lacquer = {0.0f, 0.0f, 0.0f, 1.0f};
+float reflectivity = 0.5f;
+
+// tweakables
+float roughness
+<
+  string Desc   = "Roughness";
+  string gui    = "slider";
+  float uimin   = 0.0;
+  float uimax   = 1.0;
+  float uistep  = 0.1;
+> = 0.13; 
+float bumpScale
+<
+  string Desc   = "BumpScale";
+  string gui    = "slider";
+  float uimin   = 0.0;
+  float uimax   = 2.0;
+  float uistep  = 0.1;
+> = 1.0; 
+
+texture normalMap : NormalMap
+<
+  string Desc        = "Normal map";
+  string File        = "../textures/default_bump_normal.dds";
+  string TextureType = "2D";
+>;
+
+float bumpHeight
+<
+  string Desc   = "Bump height";
+  string gui    = "slider";
+  float uimin   = 0.0;
+  float uimax   = 2.0;
+  float uistep  = 0.1;
+> = 0.5;
+
+float maxRefl
+<
+  string gui = "slider";
+  float uimin = 0.1;
+  float uimax = 1.0;
+  float uistep = 0.05;
+> = 0.5;
+
+float minRefl
+<
+  string gui = "slider";
+  float uimin = 0.0;
+  float uimax = 1.0;
+  float uistep = 0.05;
+> = 0.02;
+
+float fresnelEXP
+<
+  string gui = "slider";
+  float uimin = 1.0;
+  float uimax = 6.5;
+  float uistep = 0.5;
+> = 5.0;
+
+float Exposure
+<
+ string gui = "slider";
+    float uimin = -10.0f;
+    float uimax =  10.0f;
+    float uistep = 0.05f;
+> = -0.65f;
+
+float GrayTarget
+<
+ string gui = "slider";
+    float uimin = -255.0f;
+    float uimax =  255.0f;
+    float uistep = 0.05f;
+> = 0.33f;
+
+float texDimWidth = 1024.0;
+float texDimHeight = 512.0;
+
+sampler2D normalMapSampler = sampler_state
+{
+    Texture   = <normalMap>;
+ // MinFilter = Linear;
+//  MagFilter = Linear;
+MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+//  WrapS  = ClampToEdge;
+ // WrapT  = ClampToEdge;
+ // WrapR  = ClampToEdge;
+};
+float diffuseMapRotation = 0.0;
+float4 diffuseMapPosition = {1.0,1.0,0.0,0.0} ;
+texture diffuseMap ;
+
+sampler2D diffuseMapSampler = sampler_state
+{
+  Texture = <diffuseMap>;
+
+  MinFilter = LinearMipMapLinear;
+  MagFilter = Linear;
+
+  WrapS = Repeat;
+  WrapT = Repeat;
+  GenerateMipMap = true;
+};
+// structures and shaders /////////////////////
+
+struct a2v 
+{
+  float4 Position : POSITION; //in object space
+  float2 TexCoord : TEXCOORD0; // lookup normal map
+  float3 Tangent  : TEXCOORD1; //in object space
+  float3 Binormal : TEXCOORD2; //in object space
+  float3 Normal   : NORMAL; //in object space
+};
+
+struct v2f 
+{
+  float4 Position  : POSITION; //in projection space
+  float4 TexCoord  : TEXCOORD0;
+  float4 TexCoord1 : TEXCOORD1; //first row of the 3x3 transform from tangent to cube space
+  float4 TexCoord2 : TEXCOORD2; //second row of the 3x3 transform from tangent to cube space
+  float4 TexCoord3 : TEXCOORD3; //third row of the 3x3 transform from tangent to cube space
+  float4 Normal    : TEXCOORD4; //third row of the 3x3 transform from tangent to cube space
+  float4 TexCoord5 : TEXCOORD5;
+  float oClp : CLP0;
+float oClp1 : CLP1;
+};
+
+float4 knee (float4 x, float f)
+{
+  return log (x * f + 1) / f;
+}
+
+v2f BumpReflectVS(a2v     IN,
+                  uniform float4x4 WorldViewProj,
+                  uniform float4x4 World,
+		  uniform float4x4 WorldIT,
+                  uniform float4x4 ViewIT,
+ uniform float4x4 view
+, uniform float minrefl
+		   , uniform float maxrefl
+		   , uniform float fresnelexp,
+uniform float bummscale,
+uniform float roughh,
+uniform float4 DiffuseMapPosition,
+uniform float texAlpha 
+		 )
+{
+  v2f OUT;
+// OUT.TexCoord5.xy =float2(DiffuseMapPosition.z + IN.TexCoord.x * DiffuseMapPosition.x ,DiffuseMapPosition.w + IN.TexCoord.y * DiffuseMapPosition.y);
+  float sinX = sin (texAlpha * 4);
+         float cosX = cos (texAlpha * 4);
+         float sinY = sin (texAlpha * 4 );
+         float2x2 rotationMatrix = float2x2( cosX, -sinX, sinY, cosX);
+  	 float2 scaledCoord    = float2(DiffuseMapPosition.z + IN.TexCoord.x * DiffuseMapPosition.x,DiffuseMapPosition.w + IN.TexCoord.y*DiffuseMapPosition.y);
+	 OUT.TexCoord5.xy = mul(scaledCoord,rotationMatrix);
+
+  // Position in screen space.
+  OUT.Position = mul(WorldViewProj, IN.Position);
+  
+  // pass texture coordinates for fetching the normal map
+  OUT.TexCoord.xy = float2(IN.TexCoord.x*bummscale,IN.TexCoord.y*bummscale);
+
+  // compute the 3x3 tranform from tangent space to world space, 
+  // which gets used in the fragment program to transform tangent space
+  // normals to world space
+  float3x3 Obj2Tangent = float3x3(IN.Tangent, IN.Binormal, IN.Normal);
+  // tangent -> object -> world
+  float3x3 Tangent2World = mul((float3x3)World, transpose(Obj2Tangent));
+
+  OUT.TexCoord1.xyz = Tangent2World[0].xyz;
+  OUT.TexCoord2.xyz = Tangent2World[1].xyz;
+  OUT.TexCoord3.xyz = Tangent2World[2].xyz;
+  float4 worldPos = mul(World,IN.Position);
+  // compute the eye vector (going from shaded point to eye) in cube space
+  float4 eyeVector = worldPos - ViewIT[3]; // view inv. transpose contains eye position in world space in last row.
+  OUT.TexCoord1.w = eyeVector.x;
+  OUT.TexCoord2.w = eyeVector.y;
+  OUT.TexCoord3.w = eyeVector.z;
+
+// if we ever want to do frensel in the vertex shader.. (looks bad) then this is the way to do it..
+  float3 N = mul( WorldIT,float4(IN.Normal, 1.0f)).xyz;
+ // OUT.Normal.xyz =  normalize(mul(IN.Normal, WorldI).xyz); // multiply with inverse transpose
+  OUT.Normal.xyz = normalize( N ); 
+  float3 NNI = normalize (N);
+  float3 VVI = normalize (eyeVector.xyz);
+  OUT.Normal.w = minrefl + (maxrefl-minrefl) * pow((1.0-abs(dot(VVI,NNI))), fresnelexp) / (4.0 - 3.0*(1.0-roughh));
+  //OUT.Normal.w = lerp(maxrefl,minrefl,pow(abs(dot(N,eyeVector)),1.0/fresnelexp) );
+
+
+ // custom clipping planes.
+  float4 eyePoll  = mul(view,  float4(worldPos.xyz,1));
+  OUT.oClp =  dot(glstate.clip[0].plane,eyePoll);
+ OUT.oClp1 =  dot(glstate.clip[1].plane,eyePoll);
+
+
+  return OUT;
+}
+
+struct f2fb
+{
+  float4 col : COLOR;
+};
+float3 perturbNormalArb(float3 surf_pos, float3 surf_norm, float2 dHdxy)
+{
+	float3 vSigmaX = ddx_arb( surf_pos );
+	float3 vSigmaY = ddy_arb( surf_pos );
+	float3 vN = surf_norm;		// normalized
+	
+	float3 R1 = cross(vSigmaY,vN);
+	float3 R2 = cross(vN,vSigmaX);
+	
+	float fDet = dot(vSigmaX, R1);
+	
+	float3 vGrad = sign(fDet) * ( dHdxy.x * R1 + dHdxy.y * R2 );
+	return normalize( abs(fDet)*surf_norm - vGrad);
+}
+
+f2fb BumpReflectPS(v2f IN,
+		   uniform samplerCUBE textureENV,
+                   uniform sampler2D NormalMap,
+                   uniform float BumpScale,
+ 		   uniform float4 gAmbient,
+                   uniform NVSGLight light[8],
+                   uniform NVSGMaterial material,
+		   uniform float4x4 ViewIT,
+ uniform float4x4 WorldIT,
+uniform float roughh,
+uniform float  texDimWidth,
+uniform float texDimHeight,
+
+uniform float exposure,
+uniform float graytarget,
+ uniform sampler2D DiffuseMapSampler 
+) 
+{
+  float3 eyevec = float3(IN.TexCoord1.w, IN.TexCoord2.w, IN.TexCoord3.w);
+  float3 P = 0;
+  P.x = eyevec.x + ViewIT[3].x;
+  P.y = eyevec.y + ViewIT[3].y;
+  P.z = eyevec.z + ViewIT[3].z;
+
+  float3 ambientSum = 0;
+  float3 diffuseSum = 0;
+  float3 specularSum = 0;
+
+// texture size in pixels.
+float3 N = 0;
+
+  float2 vDim;
+  vDim = float2 (texDimWidth,texDimHeight);
+if (vDim.x > 0)
+{
+  // Center derefferencing. 
+  float2 texST = IN.TexCoord.xy;
+  float2 dSTdx = ddx_arb(texST);
+  float2 dSTdy = ddy_arb(texST);
+ 
+  float pixel  = 0.5 * length(1.0/vDim.xy);//vfim.
+  float dSTdxL = length(dSTdx);
+  float dSTdyL = length(dSTdy);
+  
+  dSTdx = (dSTdx / dSTdxL) * max(dSTdxL,pixel);
+  dSTdy = (dSTdy / dSTdyL) * max(dSTdyL,pixel);
+
+  float dBx = tex2D(NormalMap, texST+0.5*dSTdx).x - tex2D(NormalMap, texST-0.5*dSTdx).x;
+  float dBy = tex2D(NormalMap, texST+0.5*dSTdy).x - tex2D(NormalMap, texST+0.5*dSTdx).x;
+
+	
+  const float fMaterialSpecificScale = 1.0/sqrt(vDim.x*vDim.y);
+  float fFinalBumpScale =  40*bumpHeight*fMaterialSpecificScale;
+
+  float2 fDerivs = float2(dBx,dBy) * fFinalBumpScale;
+  N = perturbNormalArb(P, normalize(IN.Normal.xyz), fDerivs.xy);
+}
+else
+{	
+  // fetch the bump normal from the normal map
+  float3 normal = (tex2D(NormalMap, IN.TexCoord.xy).xyz - 0.5) * 2.0; // expand
+  normal = normalize(float3(normal.x * BumpScale, normal.y * BumpScale, normal.z)); 
+  float3x3 tangent2World = float3x3(IN.TexCoord1.xyz, IN.TexCoord2.xyz, IN.TexCoord3.xyz);
+  float3 worldNorm = mul(worldIT,float4(normal, 1.0f));
+  N = normalize(normalize(IN.Normal.xyz) +normalize(worldNorm.xyz));
+}
+// HDRI STUFF...
+  float GRTT = 0.33; // the real Gray target
+  float3 RN =  normalize(IN.Normal.xyz);
+//  float3 reflVector  = reflect(eyevec,N);
+
+  float3 reflVector;
+
+  if (indexOfRefraction == 0.0)
+     reflVector = reflect(eyevec, N);
+  else
+     reflVector  = refract(eyevec, -N,indexOfRefraction);
+
+  exposure   = pow(2.0h, exposure + 2.47393h) ;
+
+  float4 cubeColor;
+ // cubeColor = texCUBE(textureENV, reflVector);
+  float mipbias = calcMipLevel (roughh,material.shininess);
+
+  cubeColor = texCUBEbias(textureENV, reflVector, mipbias);
+  cubeColor.xyz = max(float3(0.0h, 0.0h, 0.0h), cubeColor.xyz * exposure);
+
+  // shouldn't this be done for each channel ?
+  cubeColor = (cubeColor > 0.0h) ? knee (cubeColor, 0.184874h) : cubeColor;
+
+  cubeColor*= GRTT ;
+  float3 eyeVecNor = -normalize (eyevec);
+  for ( int i=0; i<light.length; ++i )
+  {
+    float3 ambientLight;
+    float3 diffuseLight;
+    float3 specularLight;
+
+   lighting_beckmann2( N,light[i], P,  RN,eyeVecNor , material.shininess,roughh,minRefl, ambientLight, diffuseLight, specularLight );
+
+    // sum up
+    ambientSum += ambientLight;
+    diffuseSum += diffuseLight;
+    specularSum += specularLight;
+  }
+
+ // float  fres = minrefl + (maxrefl-minrefl) * pow((1.0-abs(dot(eyevec,RN))), fresnelexp);
+  // compute fresnel equation
+  //float F = minrefl + (maxrefl-minrefl)*pow(1.0 - abs(dot(eyevec, reflVector )), fresnelEXP);
+  float2 tc = IN.TexCoord5.xy ;
+  float4 diffuseColorTex = float4(tex2D(DiffuseMapSampler, tc).rgb,1.0);
+
+  float frenel = IN.Normal.w;//lerp(maxrefl,minrefl,pow(-abs(dot(N,eyevec)),1.0/fresnelexp) ); // frensel term saved in normal just looks bad..
+  float4 ambient = material.ambient * gAmbient + material.ambient * float4(ambientSum, 1);
+  float4 diffuse = (graytarget*diffuseColorTex* material.diffuse + (1-graytarget)*material.diffuse) * float4(diffuseSum, 1);
+  float4 specular = material.specular * float4(specularSum, 1);
+  float4 reflColor = (1.0-frenel)*( float4(lacquer.xyz,1.0) * (1-graytarget) ) + frenel * cubeColor * reflectivity;
+
+  f2fb OUT;
+
+//  OUT.col =  ( 1-   frenel) * (material.emission + ambient + diffuse + specular) +  (frenel) *cubeColor;
+  OUT.col = ambient + diffuse + specular + reflColor;
+  OUT.col.w = min (1.0,material.diffuse.w + (1.0 - frenel));
+  return OUT;
+}
+
+void BumpReflectPSMRT(v2f IN,
+		   uniform samplerCUBE textureENV,
+                   uniform sampler2D NormalMap,
+                   uniform float BumpScale,
+ 		   uniform float4 gAmbient,
+                   uniform NVSGLight light[8],
+                   uniform NVSGMaterial material,
+		   uniform float4x4 ViewIT,
+ uniform float4x4 WorldIT,
+uniform float roughh,
+uniform float  texDimWidth,
+uniform float texDimHeight,
+
+uniform float exposure,
+uniform float graytarget,
+ uniform sampler2D DiffuseMapSampler ,
+uniform float4x4 worldviewMat
+ , out float4 normColor : COLOR0
+                , out float4 deepColor : COLOR1) 
+
+{
+  float3 eyevec = float3(IN.TexCoord1.w, IN.TexCoord2.w, IN.TexCoord3.w);
+  float3 P = 0;
+  P.x = eyevec.x + ViewIT[3].x;
+  P.y = eyevec.y + ViewIT[3].y;
+  P.z = eyevec.z + ViewIT[3].z;
+
+  float3 ambientSum = 0;
+  float3 diffuseSum = 0;
+  float3 specularSum = 0;
+
+// texture size in pixels.
+float3 N = 0;
+
+  float2 vDim;
+  vDim = float2 (texDimWidth,texDimHeight);
+if (vDim.x > 0)
+{
+  // Center derefferencing. 
+  float2 texST = IN.TexCoord.xy;
+  float2 dSTdx = ddx_arb(texST);
+  float2 dSTdy = ddy_arb(texST);
+ 
+  float pixel  = 0.5 * length(1.0/vDim.xy);//vfim.
+  float dSTdxL = length(dSTdx);
+  float dSTdyL = length(dSTdy);
+  
+  dSTdx = (dSTdx / dSTdxL) * max(dSTdxL,pixel);
+  dSTdy = (dSTdy / dSTdyL) * max(dSTdyL,pixel);
+
+  float dBx = tex2D(NormalMap, texST+0.5*dSTdx).x - tex2D(NormalMap, texST-0.5*dSTdx).x;
+  float dBy = tex2D(NormalMap, texST+0.5*dSTdy).x - tex2D(NormalMap, texST+0.5*dSTdx).x;
+
+	
+  const float fMaterialSpecificScale = 1.0/sqrt(vDim.x*vDim.y);
+  float fFinalBumpScale =  40*bumpHeight*fMaterialSpecificScale;
+
+  float2 fDerivs = float2(dBx,dBy) * fFinalBumpScale;
+  N = perturbNormalArb(P, normalize(IN.Normal.xyz), fDerivs.xy);
+}
+else
+{	
+  // fetch the bump normal from the normal map
+  float3 normal = (tex2D(NormalMap, IN.TexCoord.xy).xyz - 0.5) * 2.0; // expand
+  normal = normalize(float3(normal.x * BumpScale, normal.y * BumpScale, normal.z)); 
+  float3x3 tangent2World = float3x3(IN.TexCoord1.xyz, IN.TexCoord2.xyz, IN.TexCoord3.xyz);
+  float3 worldNorm = mul(worldIT,float4(normal, 1.0f));
+  N = normalize(normalize(IN.Normal.xyz) +normalize(worldNorm.xyz));
+}
+// HDRI STUFF...
+  float GRTT = 0.33; // the real Gray target
+  float3 RN =  normalize(IN.Normal.xyz);
+//  float3 reflVector  = reflect(eyevec,N);
+
+  float3 reflVector;
+
+  if (indexOfRefraction == 0.0)
+     reflVector = reflect(eyevec, N);
+  else
+     reflVector  = refract(eyevec, -N,indexOfRefraction);
+
+  exposure   = pow(2.0h, exposure + 2.47393h) ;
+
+  float4 cubeColor;
+ // cubeColor = texCUBE(textureENV, reflVector);
+  float mipbias = calcMipLevel (roughh,material.shininess);
+
+  cubeColor = texCUBEbias(textureENV, reflVector, mipbias);
+  cubeColor.xyz = max(float3(0.0h, 0.0h, 0.0h), cubeColor.xyz * exposure);
+
+  // shouldn't this be done for each channel ?
+  cubeColor = (cubeColor > 0.0h) ? knee (cubeColor, 0.184874h) : cubeColor;
+
+  cubeColor*= GRTT ;
+  float3 eyeVecNor = -normalize (eyevec);
+  for ( int i=0; i<light.length; ++i )
+  {
+    float3 ambientLight;
+    float3 diffuseLight;
+    float3 specularLight;
+
+   lighting_beckmann2( N,light[i], P,  RN,eyeVecNor , material.shininess,roughh,minRefl, ambientLight, diffuseLight, specularLight );
+
+    // sum up
+    ambientSum += ambientLight;
+    diffuseSum += diffuseLight;
+    specularSum += specularLight;
+  }
+
+ // float  fres = minrefl + (maxrefl-minrefl) * pow((1.0-abs(dot(eyevec,RN))), fresnelexp);
+  // compute fresnel equation
+  //float F = minrefl + (maxrefl-minrefl)*pow(1.0 - abs(dot(eyevec, reflVector )), fresnelEXP);
+  float2 tc = IN.TexCoord5.xy ;
+  float4 diffuseColorTex = float4(tex2D(DiffuseMapSampler, tc).rgb,1.0);
+
+  float frenel = IN.Normal.w;//lerp(maxrefl,minrefl,pow(-abs(dot(N,eyevec)),1.0/fresnelexp) ); // frensel term saved in normal just looks bad..
+  float4 ambient = material.ambient * gAmbient + material.ambient * float4(ambientSum, 1);
+  float4 diffuse = (graytarget*diffuseColorTex* material.diffuse + (1-graytarget)*material.diffuse) * float4(diffuseSum, 1);
+  float4 specular = material.specular * float4(specularSum, 1);
+  float4 reflColor = (1.0-frenel)*( float4(lacquer.xyz,1.0) * (1-graytarget) ) + frenel * cubeColor * reflectivity;
+
+  float4 result;
+
+//  OUT.col =  ( 1-   frenel) * (material.emission + ambient + diffuse + specular) +  (frenel) *cubeColor;
+  result = ambient + diffuse + specular + reflColor;
+  result.w = min (1.0,material.diffuse.w + (1.0 - frenel));
+
+
+
+float3 viewspacePos = mul (float4(P.xyz,1.0),worldviewMat).xyz;
+normColor = float4(N.rgb, 0.01*viewspacePos.z);
+
+deepColor = result;
+
+ 
+}
+
+//////// techniques ////////////////////////////
+
+technique Main
+{
+  pass p0
+  {
+    DepthTestEnable = true;
+    DepthMask       = true;
+    CullFaceEnable  = false;
+
+    VertexProgram   = compile latest BumpReflectVS(worldViewProj,world,worldIT,viewInverseMatrix,viewMatrix,minRefl,maxRefl,fresnelEXP,bumpScale,roughness,diffuseMapPosition,diffuseMapRotation );
+    FragmentProgram = compile latest BumpReflectPS(textureHDR_RGBA,normalMapSampler,bumpHeight,scene.ambient, light, material,viewInverseMatrix,worldIT,roughness,texDimWidth,texDimHeight,Exposure,GrayTarget,diffuseMapSampler );
+  }
+}
+
+technique MainMRT
+{
+  pass p0
+  {
+    DepthTestEnable = true;
+    DepthMask       = true;
+    CullFaceEnable  = false;
+
+    VertexProgram   = compile latest BumpReflectVS(worldViewProj,world,worldIT,viewInverseMatrix,viewMatrix,minRefl,maxRefl,fresnelEXP,bumpScale,roughness,diffuseMapPosition,diffuseMapRotation );
+    FragmentProgram = compile latest BumpReflectPSMRT(textureHDR_RGBA,normalMapSampler,bumpHeight,scene.ambient, light, material,viewInverseMatrix,worldIT,roughness,texDimWidth,texDimHeight,Exposure,GrayTarget,diffuseMapSampler,worldViewMatrix );
+  }
+}
+
+

@@ -1,0 +1,625 @@
+/* --------------------------------*/
+/* Copyright 2010-2013 Assaf Yariv */
+/* --------------------------------*/
+// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
+// (the "Fluent UI") and is provided only as referential material to supplement the 
+// Microsoft Foundation Classes Reference and related electronic documentation 
+// included with the MFC C++ library software.  
+// License terms to copy, use or distribute the Fluent UI are available separately.  
+// To learn more about our Fluent UI licensing program, please visit 
+// http://msdn.microsoft.com/officeui.
+//
+// Copyright (C) Microsoft Corporation
+// All rights reserved.
+
+// MainFrm.h : interface of the CMainFrame class
+//
+
+#pragma once
+#include "FileView.h"
+#include "ShellView.h"
+#include "ServerView.h"
+#include "ElementView.h"
+#include "WebBrowserBar.h"
+#include "HtmlEditor.h"
+#include "Resource.h"
+
+class CAvocadoView;
+class CAvocadoDoc;
+class COutlookBar : public CMFCOutlookBar
+{
+	virtual BOOL AllowShowOnPaneMenu() const { return TRUE; }
+	virtual void GetPaneName(CString& strName) const { BOOL bNameValid = strName.LoadString(IDS_OUTLOOKBAR); ASSERT(bNameValid); if (!bNameValid) strName.Empty(); }
+};
+
+class CMainFrame : public CFrameWndEx
+{
+	
+protected: // create from serialization only
+	CMainFrame();
+	DECLARE_DYNCREATE(CMainFrame)
+	void ExportDialog (int i);
+	void ImportDialog (int i);
+// Attributes
+protected:
+	CSplitterWnd m_wndSplitter;
+public:
+	void ShowCaptionBar();
+	BOOL OnRenameElement ();
+	bool ImportFile (LPCTSTR lpszFileName);
+	bool GetActiveViewFilter (const char* param,unsigned int filt);
+	void ToggleViewFilter (const char* param, unsigned int filt);
+	bool IsActiveDocumentNonEmpty();
+	void FetchMaterialValue (UINT cmdID);
+	void FetchMaterialValueSlider (UINT cmdID);
+	void FetchMaterialValueSlider2 (UINT cmdID);
+	bool FetchMaterialValueCheckbox (UINT cmdID,CCmdUI *pCmdUI);
+	void FetchMaterialValueEditBox (UINT cmdID);
+	void SetDocParamColorValue (UINT cmd,string docParam);
+	void SetSpotLightColorValue (UINT cmd,string docParam);
+	int GetActiveViewIntParam (const char *param);
+	void SetDocParamCheckBox (UINT cmdid , std::string param);
+	void UpdateColorButton (CCmdUI *pCmdUI, UINT butID, bool butMode = true);
+	void SetColorFromGallery (UINT cmdID);
+	void SetMaterialProp ( UINT uCmdID, string prop);
+	void SetMaterialPropSlider ( UINT uCmdID, string prop);
+	void SetMaterialPropCheckBox( UINT uCmdID, string prop);
+	void DoLightsGallery (UINT cmd);
+	void SetHeadLightOne (UINT cmd);
+	void UpdateLightSlider (UINT cmd, string docParam, bool negScale = true);
+	void SetLightValue (UINT cmd,string docParam,bool negScale = true);
+	void SetAnnotationParamSlider (UINT cmd,string docParam,bool negScale = true);
+	void UpdateAnnotationSlider (UINT cmd, string docParam, bool negScale = true);
+	void UpdateHeadLightSlider (UINT cmd );
+	void SetLightPreset (int presetID);
+	bool IsActiveViewOrthographic ();
+	bool ActiveViewHasSelection ();
+	bool ActiveViewHasSingleSelection ();
+	void RefreshViewSelection();
+	bool IsCurrentSelectionVisible ();
+	bool IsCurrentSelectionHidden();
+	bool UpdateDocParamCheckBox (std::string param);
+	void RefreshDocLoadStatus();
+	void RefreshActiveDocument ();
+	void RefreshViewStates ();
+	void RefreshMaterialStates();
+	bool ActiveViewHasHiddenSelection ();
+	CAvocadoView* GetActiveAvocadoView ();
+	CAvocadoDoc* GetActiveAvocadoDoc ();
+	void SetElementsMaterial (vector<int> eids,string data);
+	bool ExportDocument (CString newname);
+	int GetActiveDocID ();
+	int	GetActiveViewID();
+	void AvocadoMakeGroup (std::string group_type);
+	CMFCRibbonBaseElement * GetRibbonBaseElement (UINT uCmdID);
+	int GetRibbonSliderValue (UINT uCmdID);
+	void SetRibbonSliderValue (UINT uCmdID,int pos);
+	void UpdateViewStateGallery(int vsCount);
+	int m_clipboard;
+	int m_waitCommand;
+	std::string m_waitData;
+	bool m_outlookBarVisible;
+// Operations
+public:
+
+// Overrides
+public:
+	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	BOOL OnViewChange(UINT nCmdID);
+
+
+// Implementation
+public:
+	virtual ~CMainFrame();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+
+protected:  // control bar embedded members
+	CMFCRibbonBar     m_wndRibbonBar;
+	CMFCRibbonApplicationButton m_MainButton;
+	CMFCToolBarImages m_PanelImages;
+	CMFCRibbonStatusBar  m_wndStatusBar;
+	CHtmlEditor         m_wndWebView;
+	CFileView         m_wndFileView;
+	CServerView		  m_wndServerView;
+	CElementView        m_wndClassView;
+	COutlookBar       m_wndNavigationBar;
+	CMFCShellTreeCtrl m_wndTree;
+	CShellView	  m_wndShellView;
+	CWebBrowserBar      m_wndCalendar;
+	CMFCCaptionBar    m_wndCaptionBar;
+	void OnHtmlEditorSave ();
+	void OnTakeSnapshot ();
+// Generated message map functions
+protected:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnApplicationLook(UINT id);
+	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
+	afx_msg void OnViewCaptionBar();
+	afx_msg void OnUpdateViewCaptionBar(CCmdUI* pCmdUI);
+	afx_msg void OnOptions();
+	afx_msg void OnFilePrint();
+	afx_msg void OnFilePrintPreview();
+	afx_msg void OnUpdateFilePrintPreview(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateAddSectionPlane(CCmdUI *pCmdUI);
+	afx_msg void OnAddSectionPlane();
+	DECLARE_MESSAGE_MAP()
+
+	BOOL CreateDockingWindows(bool create = true);
+	void SetDockingWindowIcons(BOOL bHiColorIcons);
+	BOOL CreateOutlookBar(CMFCOutlookBar& bar, UINT uiID, CMFCShellTreeCtrl& tree, CWebBrowserBar& calendar, int nInitialWidth);
+	BOOL CreateCaptionBar();
+	// Avocado
+	void SetMaterial (int id);
+	void SetBackImagePreset (int preset);
+	int FindFocusedOutlookWnd(CMFCOutlookBarTabCtrl** ppOutlookWnd);
+
+	CMFCOutlookBarTabCtrl* FindOutlookParent(CWnd* pWnd);
+	CMFCOutlookBarTabCtrl* m_pCurrOutlookWnd;
+	CMFCOutlookBarPane*    m_pCurrOutlookPage;
+public:
+	afx_msg void OnClassViewSelection(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnUpdateSelectPart(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationFitPage(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationBack(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationFront(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationLeft(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationRight(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationTop(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationBottom(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationCustom(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationDef1(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationDef2(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSelectArea(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSelectAll(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStyleFlat(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStyleHlr(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStyleToon(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStyleShaded(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStyleOrthographicView(CCmdUI *pCmdUI);
+	afx_msg void OnStyleShaded();
+	afx_msg void OnStyleToon();
+	afx_msg void OnStyleHlr();
+	afx_msg void OnStyleFlat();
+	afx_msg void OnUpdateMenusStyle(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMenusSelect(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMenusOrientaion(CCmdUI *pCmdUI);
+	afx_msg void OnStyleOrthographicView();
+	afx_msg void OnUpdateAppreanceHide(CCmdUI *pCmdUI);
+//	afx_msg void OnUpdateAvocadoviewMaterial(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateEditClear(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateEditCopy(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateEditCut(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOrientationLookAt(CCmdUI *pCmdUI);
+	afx_msg void OnEditCopy();
+	afx_msg void OnEditClear();
+	afx_msg void OnEditCut();
+	afx_msg void OnUpdateEditPaste(CCmdUI *pCmdUI);
+	afx_msg void OnModelMove();
+	afx_msg void OnUpdateModelMove(CCmdUI *pCmdUI);
+	afx_msg void OnModelRotate();
+	afx_msg void OnUpdateModelRotate(CCmdUI *pCmdUI);
+	afx_msg void OnModelScale();
+	afx_msg void OnUpdateModelScale(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplayAnnotation(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplayBackground(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplayCameras(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplayLights(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplaySpincenter(CCmdUI *pCmdUI);
+	afx_msg void OnDisplaySpincenter();
+	afx_msg void OnDisplayLights();
+	afx_msg void OnDisplayCameras();
+	afx_msg void OnDisplayAnnotation();
+	afx_msg void OnDisplayBackground();
+	afx_msg void OnUpdateTrackingUsermode(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateTrackingFlymode(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateTrackingCadmode(CCmdUI *pCmdUI);
+	afx_msg void OnTrackingCadmode();
+	afx_msg void OnTrackingFlymode();
+	afx_msg void OnTrackingUsermode();
+	afx_msg void OnGraphicsRaytracing();
+	afx_msg void OnUpdateGraphicsRaytracing(CCmdUI *pCmdUI);
+	afx_msg void OnGraphicsAntiAliasing();
+	afx_msg void OnUpdateGraphicsAntiAliasing(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateGraphicsStereo(CCmdUI *pCmdUI);
+	afx_msg void OnGraphicsStereo();
+	afx_msg void OnUpdateApperanceUnhide(CCmdUI *pCmdUI);
+//	afx_msg void OnUpdateAppreanceUnhideall(CCmdUI *pCmdUI);
+	afx_msg void OnAppreanceHide();
+	afx_msg void OnAppreanceUnhideall();
+	afx_msg void OnApperanceUnhide();
+//	afx_msg void s(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateAppreanceUnhideall(CCmdUI *pCmdUI);
+	afx_msg void OnOrientationBack();
+	afx_msg void OnOrientationBottom();
+	afx_msg void OnOrientationCustom();
+	afx_msg void OnOrientationDef1();
+	afx_msg void OnOrientationDef2();
+	afx_msg void OnOrientationFront();
+	afx_msg void OnOrientationTop();
+	afx_msg void OnOrientationLeft();
+	afx_msg void OnOrientationRight();
+	afx_msg void OnOrientationLookAt();
+//	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	afx_msg void OnUpdateAvocadoviewMaterial(CCmdUI *pCmdUI);
+//	afx_msg void OnProperties();
+	afx_msg void OnEditPaste();
+	afx_msg void OnSplitElement();
+	afx_msg void OnUpdateSplitElement(CCmdUI *pCmdUI);
+	afx_msg void OnTrackingPreselectionhightlights();
+	afx_msg void OnUpdateTrackingPreselectionhightlights(CCmdUI *pCmdUI);
+	afx_msg void OnMaterialColor();
+	afx_msg void OnUpdateMaterialColor(CCmdUI *pCmdUI);
+	afx_msg void OnApperanceMaterial0();
+	afx_msg void OnApperanceMaterial2();
+	afx_msg void OnApperanceMaterial3();
+	afx_msg void OnApperanceMaterial4();
+	afx_msg void OnApperanceMaterial5();
+	afx_msg void OnApperanceMaterial6();
+	afx_msg void OnApperanceMaterial7();
+	afx_msg void OnApperanceMaterial1();
+	afx_msg void OnOrientationFitPage();
+	afx_msg void OnApperanceMaterial8();
+	afx_msg void OnApperanceMaterial9();
+	afx_msg void OnModelResettodefault();
+	afx_msg void OnModelResettoori();
+	afx_msg void OnUpdateModelReset(CCmdUI *pCmdUI);
+	afx_msg void OnLayoutNewpage();
+	afx_msg void OnLayoutNextpage();
+	afx_msg void OnLayoutBackpage();
+	afx_msg void OnLayoutDeletepage();
+	afx_msg void OnLayoutDuplicatepage();
+	afx_msg void OnApperanceMaterial14();
+	afx_msg void OnApperanceMaterial13();
+	afx_msg void OnApperanceMaterial15();
+	afx_msg void OnApperanceMaterial10();
+	afx_msg void OnUpdateIndicator(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMaterialPlastic(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMaterialWood(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMaterialStone(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMaterialGlass(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMaterialFabric(CCmdUI *pCmdUI);
+	afx_msg void OnAvoacdogalleryFramegal();
+	afx_msg void OnLayoutBackgroundcolor();
+	afx_msg void OnLayoutBackgroundgradient();
+	afx_msg void OnLayoutBackgroundimage();
+	afx_msg void OnAvoacdogalleryLights();
+	afx_msg void OnLayoutFram();
+	afx_msg void OnLayoutFramwtwow();
+	afx_msg void OnLayoutFrametwoh();
+	afx_msg void OnLayoutFramefour();
+	afx_msg void OnUpdateLayoutFramefour(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutFrametwoh(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutFramwtwow(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutFram(CCmdUI *pCmdUI);
+	afx_msg void OnLayoutBackgroundimageselect();
+	afx_msg void OnTexture();
+	afx_msg void OnBump();
+	afx_msg void OnLayoutSlidertwo();
+	afx_msg void OnLayoutSliderone();
+	afx_msg void OnUpdateLayoutNewpage(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutNextpage(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutBackpage(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutSlidertwo(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateLayoutSliderone(CCmdUI *pCmdUI);
+//	afx_msg void OnFilePublish();
+	afx_msg void OnExportpageWavefront();
+	afx_msg void OnExportpageJpeg();
+	afx_msg void OnExportpageNvidia();
+	afx_msg void OnExportpageBitmap();
+	afx_msg void OnFileCollada();
+	afx_msg void OnImport3dstudio();
+	afx_msg void OnImportVrml();
+	afx_msg void OnImportWavefront();
+	afx_msg void OnImportNvidiaformat();
+//	afx_msg void OnPublishToserver();
+//	afx_msg void OnPublishTolocalarchive();
+	afx_msg void OnAvocdomainTogglebrows();
+	afx_msg void OnUpdateFileUpdate(CCmdUI *pCmdUI);
+	afx_msg void OnApperanceMaterial11();
+	afx_msg void OnApperanceMaterial12();
+	afx_msg void OnApperanceMaterial16();
+	afx_msg void OnApperanceMaterial17();
+	afx_msg void OnApperanceMaterial20();
+	afx_msg void OnApperanceMaterial30();
+	afx_msg void OnMpDiffuse();
+	afx_msg void OnUpdateMpDiffuse(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpExposure(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpAmbient(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpFrenselexp(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpMaxrefl(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpMinrefl(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpOpacity(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpPolishness(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpRoughness(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpShininess(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpSpecular(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpBasecolor(CCmdUI *pCmdUI);
+	afx_msg void OnMpBasecolor();
+	afx_msg void OnMpAmbient();
+	afx_msg void OnMpExposure();
+	afx_msg void OnMpFrenselexp();
+	afx_msg void OnMpShininess();
+	afx_msg void OnMpOpacity();
+	afx_msg void OnMpRoughness();
+	afx_msg void OnMpSpecular();
+	afx_msg void OnMpMinrefl();
+	afx_msg void OnMpMaxrefl();
+	afx_msg void OnMpPolishness();
+	afx_msg void OnSlider();
+	afx_msg void OnSliderRoughness();
+	afx_msg void OnSliderSpecular();
+	afx_msg void OnSliderAmbient();
+	afx_msg void OnSliderOpacity();
+	afx_msg void OnSliderShininess();
+	afx_msg void OnUpdateSliderAmbient(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSlider(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderSpecular(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderOpacity(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderShininess(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderRoughness(CCmdUI *pCmdUI);
+	afx_msg void OnSliderReflectivity();
+	afx_msg void OnUpdateSliderReflectivity(CCmdUI *pCmdUI);
+	afx_msg void OnMpReflectivity();
+	afx_msg void OnUpdateMpReflectivity(CCmdUI *pCmdUI);
+	afx_msg void OnSliderMinrefl();
+	afx_msg void OnSliderMaxrefl();
+	afx_msg void OnUpdateSliderMaxrefl(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderMinrefl(CCmdUI *pCmdUI);
+	afx_msg void OnSliderFresnelExp();
+	afx_msg void OnUpdateSliderFresnelExp(CCmdUI *pCmdUI);
+	afx_msg void OnSliderExposure();
+	afx_msg void OnUpdateSliderExposure(CCmdUI *pCmdUI);
+	afx_msg void OnSliderPolishness();
+	afx_msg void OnUpdateSliderPolishness(CCmdUI *pCmdUI);
+	afx_msg void OnCheckboxWood();
+	afx_msg void OnUpdateCheckboxWood(CCmdUI *pCmdUI);
+	afx_msg void OnSliderRingscale();
+	afx_msg void OnUpdateSliderRingscale(CCmdUI *pCmdUI);
+	afx_msg void OnSliderWoodscale1();
+	afx_msg void OnUpdateSliderWoodscale1(CCmdUI *pCmdUI);
+	afx_msg void OnSliderWoodscale2();
+	afx_msg void OnUpdateSliderWoodscale2(CCmdUI *pCmdUI);
+	afx_msg void OnMpIswood();
+	afx_msg void OnUpdateMpIswood(CCmdUI *pCmdUI);
+	afx_msg void OnSliderBumpheight();
+	afx_msg void OnSliderBumpscale();
+	afx_msg void OnUpdateSliderBumpheight(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderBumpscale(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateEditboxBumpfile(CCmdUI *pCmdUI);
+	afx_msg void OnStatic();
+	afx_msg void OnBrowseBump();
+	afx_msg void OnCheckboxBumpnormal();
+	afx_msg void OnUpdateCheckboxBumpnormal(CCmdUI *pCmdUI);
+	afx_msg void OnAvoacdogalleryBump();
+	afx_msg void OnAvoacdogalleryWoodcolor();
+	afx_msg void OnAvoacdogalleryWoodbump();
+	afx_msg void OnMpEnablebump();
+	afx_msg void OnMpClearbump();
+	afx_msg void OnSliderWoodintensity();
+	afx_msg void OnUpdateSliderWoodintensity(CCmdUI *pCmdUI);
+	afx_msg void OnMpBrowsetexture();
+	afx_msg void OnAvoacdogalleryTexture();
+	afx_msg void OnSliderScaleu();
+	afx_msg void OnSliderScaleV();
+	afx_msg void OnUpdateEditboxTexturefile(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderScaleV(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderScaleu(CCmdUI *pCmdUI);
+	afx_msg void OnMpCleartexture();
+	afx_msg void OnSliderTexoffsetu();
+	afx_msg void OnSliderTexoffsetv();
+	afx_msg void OnUpdateSliderTexoffsetv(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderTexoffsetu(CCmdUI *pCmdUI);
+	afx_msg void OnSliderTexangle();
+	afx_msg void OnUpdateSliderTexangle(CCmdUI *pCmdUI);
+	afx_msg void OnMpTextureangle();
+	afx_msg void OnUpdateMpTextureangle(CCmdUI *pCmdUI);
+	afx_msg void OnMpEnableskin();
+	afx_msg void OnMpEnablehair();
+	afx_msg void OnUpdateMpEnableskin(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMpEnablehair(CCmdUI *pCmdUI);
+	afx_msg void OnSliderHairLength();
+	afx_msg void OnUpdateSliderHairLength(CCmdUI *pCmdUI);
+	afx_msg void OnSliderHairDens();
+	afx_msg void OnUpdateSliderHairDens(CCmdUI *pCmdUI);
+	afx_msg void OnAvoacdogalleryHair();
+	afx_msg void OnSliderSkinShin();
+	afx_msg void OnUpdateSliderSkinShin(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderSkinOil(CCmdUI *pCmdUI);
+	afx_msg void OnSliderSkinOil();
+	afx_msg void OnUpdateMpEnablebump(CCmdUI *pCmdUI);
+	afx_msg void OnMpEnabletexture();
+	afx_msg void OnUpdateMpEnabletexture(CCmdUI *pCmdUI);
+	afx_msg void OnSliderHeadlightL1();
+	afx_msg void OnSliderHeadlightL2();
+	afx_msg void OnSliderHeadlightL3();
+	afx_msg void OnUpdateSliderHeadlightL1(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderHeadlightL2(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderHeadlightL3(CCmdUI *pCmdUI);
+	afx_msg void OnAvoacdogalleryLight3();
+	afx_msg void OnAvoacdogalleryLight2();
+	afx_msg void OnAvoacdogalleryLight1();
+	afx_msg void OnMpSavePreset();
+	afx_msg void OnAvocadoviewMaterial();
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnEditPresetMaterial();
+	afx_msg void OnAvoacdogalleryEditbumppreset();
+	afx_msg void OnAvoacdogalleryAddbumpgallery();
+	afx_msg void OnAvoacdogalleryAddtexturegallery();
+	afx_msg void OnAvoacdogalleryEdittexturepreset();
+	afx_msg void OnAvoacdogalleryAddnewbumpgallery();
+	afx_msg void OnAvoacdogalleryAddnewtexturegallery();
+	afx_msg void OnAvoacdogalleryGalleryresettexture();
+	afx_msg void OnAvoacdogalleryGalleryresetbump();
+	afx_msg void OnAvoacdogalleryGalleryresetmaterial();
+	afx_msg void OnAvoacdogalleryGalleryresetwood();
+	afx_msg void OnAvoacdogalleryAddwoodgallery();
+	afx_msg void OnAvoacdogalleryEditwoodpreset();
+	afx_msg void OnAvoacdogalleryEditskinpreset();
+	afx_msg void OnAvoacdogalleryAddnewskingallery();
+	afx_msg void OnAvoacdogalleryEdithairpreset();
+	afx_msg void OnAvoacdogalleryAddnewhairgallery();
+	afx_msg void OnAvoacdogalleryGalleryresetskin();
+	afx_msg void OnAvoacdogalleryGalleryresethair();
+	afx_msg void OnAvoacdogallerySkin();
+	afx_msg void OnLightsEditlights();
+	afx_msg void OnLightsCloseeditlight();
+	afx_msg void OnAvocadoviewMakegroup();
+	afx_msg void OnUpdateAvocadoviewMakegroup(CCmdUI *pCmdUI);
+	afx_msg void OnInsertPoly();
+	afx_msg void OnInsertCube();
+	afx_msg void OnInsertSphere();
+	afx_msg void OnInsertPlane();
+	afx_msg void OnInsertCylinder();
+	afx_msg void OnInsertSimplecube();
+	afx_msg void OnCheckboxRecordcamera();
+	afx_msg void OnUpdateCheckboxRecordcamera(CCmdUI *pCmdUI);
+	afx_msg void OnInsertSpotlight();
+//	afx_msg void OnInsertPath();
+	afx_msg void OnInsertPathline();
+	afx_msg void OnSliderSpecular2();
+	afx_msg void OnUpdateSliderSpecular2(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateFileImport2(CCmdUI *pCmdUI);
+	afx_msg void OnAvocadoviewMakegroup2();
+	afx_msg void OnAvocadoviewAddtogroup();
+	afx_msg void OnViewShowAllPanes();
+	afx_msg void OnInsertPathlinecomplex();
+	afx_msg void OnInsertPathline2();
+	afx_msg void OnInsertPropsgallery();
+	afx_msg void OnInsertPropsadd();
+	afx_msg void OnInsertPropsedit();
+	afx_msg void OnInsertPropsrestore();
+	afx_msg void OnLayoutGotopagegallery();
+	afx_msg void OnLayoutBackgrounimagegallry();
+	afx_msg void OnLayoutBgimagegalleyadd();
+	afx_msg void OnLayoutBgimagegalleryedit();
+	afx_msg void OnLayoutBgimagegalleryrestore();
+	afx_msg void OnRoomCylinder();
+	afx_msg void OnRoomSphere();
+	afx_msg void OnRoomCude();
+	afx_msg void OnRoomTogglestatusbar();
+	afx_msg void OnSliderRoomscaleX();
+	afx_msg void OnSliderRoomscaleY();
+	afx_msg void OnSliderRoomscaleZ();
+	afx_msg void OnSliderGlobalExposure();
+	afx_msg void OnUpdateSliderGlobalExposure(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderRoomscaleX(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderRoomscaleY(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderRoomscaleZ(CCmdUI *pCmdUI);
+	afx_msg void OnSliderLight1X();
+	afx_msg void OnSliderLight1Y();
+	afx_msg void OnSliderLight1Z();
+	afx_msg void OnUpdateSliderLight1X(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight1Y(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight1Z(CCmdUI *pCmdUI);
+	afx_msg void OnSliderLight2X();
+	afx_msg void OnSliderLight2Y();
+	afx_msg void OnSliderLight2Z();
+	afx_msg void OnUpdateSliderLight2X(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight2Y(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight2Z(CCmdUI *pCmdUI);
+	afx_msg void OnSliderLight1Cutoff();
+	afx_msg void OnUpdateSliderLight1Cutoff(CCmdUI *pCmdUI);
+	afx_msg void OnCheckboxLight1Enabled();
+	afx_msg void OnUpdateCheckboxLight1Enabled(CCmdUI *pCmdUI);
+	afx_msg void OnSliderLight2Cutoff();
+	afx_msg void OnUpdateSliderLight2Cutoff(CCmdUI *pCmdUI);
+	afx_msg void OnCheckboxLight2Enabled();
+	afx_msg void OnUpdateCheckboxLight2Enabled(CCmdUI *pCmdUI);
+	afx_msg void OnSliderLight3X();
+	afx_msg void OnSliderLight3Y();
+	afx_msg void OnSliderLight3Z();
+	afx_msg void OnSliderLight3Cutoff();
+	afx_msg void OnCheckboxLight3Enabled();
+	afx_msg void OnUpdateSliderLight3X(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight3Y(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight3Z(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderLight3Cutoff(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateCheckboxLight3Enabled(CCmdUI *pCmdUI);
+	afx_msg void OnLayoutGlobalambientcolor();
+	afx_msg void OnLightsLight1ambient();
+	afx_msg void OnLightsLight1diffuse();
+	afx_msg void OnLightsLight1specular();
+	afx_msg void OnLightsLight2ambient();
+	afx_msg void OnLightsLight2diffuse();
+	afx_msg void OnLightsLight2specular();
+	afx_msg void OnLightsLight3ambient();
+	afx_msg void OnLightsLight3diffuse();
+	afx_msg void OnLightsLight3specular();
+	afx_msg void OnLightsSpotambient();
+	afx_msg void OnLightsSpotdiffuse();
+	afx_msg void OnLightsSpotspecular();
+	afx_msg void OnSliderSpotAttunuation();
+	afx_msg void OnSliderSpotIntensity();
+	afx_msg void OnSliderSpotExponent();
+	afx_msg void OnUpdateSliderSpotExponent(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderSpotAttunuation(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderSpotIntensity(CCmdUI *pCmdUI);
+	afx_msg void OnSliderSpotLinear();
+	afx_msg void OnSliderSpotQuadric();
+	afx_msg void OnUpdateSliderSpotLinear(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderSpotQuadric(CCmdUI *pCmdUI);
+	afx_msg void OnSliderIor();
+	afx_msg void OnUpdateSliderIor(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateRoomCylinder(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateRoomCude(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateRoomSphere(CCmdUI *pCmdUI);
+	afx_msg void OnFileOptions();
+	afx_msg void OnAvocadoviewMakeweld();
+	afx_msg void OnMaterialstateCombo();
+	afx_msg void OnMaterialstateAdd();
+	afx_msg void OnUpdateMaterialstateAdd(CCmdUI *pCmdUI);
+	afx_msg void OnMaterialstateDelete();
+	afx_msg void OnUpdateMaterialstateDelete(CCmdUI *pCmdUI);
+	afx_msg void OnMaterialstateAddexisting();
+	afx_msg void OnUpdateMaterialstateAddexisting(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectBright();
+	afx_msg void OnSliderEffectCont();
+	afx_msg void OnUpdateSliderEffectBright(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderEffectCont(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectHue();
+	afx_msg void OnSliderEffectSaturate();
+	afx_msg void OnSliderEffectNoise();
+	afx_msg void OnUpdateSliderEffectNoise(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectSoften();
+	afx_msg void OnUpdateSliderEffectSoften(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderEffectHue(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSliderEffectSaturate(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectSaturate();
+	afx_msg void OnUpdateCheckEffectSaturate(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectBright();
+	afx_msg void OnUpdateCheckEffectBright(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectNoise();
+	afx_msg void OnUpdateCheckEffectNoise(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectSoften();
+	afx_msg void OnUpdateCheckEffectSoften(CCmdUI *pCmdUI);
+	afx_msg void OnButtonEffectPost();
+	afx_msg void OnUpdateButtonEffectPost(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectAo();
+	afx_msg void OnUpdateCheckEffectAo(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectGamma();
+	afx_msg void OnCheckEffectTonemap();
+	afx_msg void OnCheckEffectFxaa();
+	afx_msg void OnUpdateCheckEffectGamma(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateCheckEffectTonemap(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateCheckEffectFxaa(CCmdUI *pCmdUI);
+	afx_msg void OnCheckEffectDof();
+	afx_msg void OnUpdateCheckEffectDof(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectDofplane();
+	afx_msg void OnUpdateSliderEffectDofplane(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectGamma();
+	afx_msg void OnUpdateSliderEffectGamma(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectTonemap();
+	afx_msg void OnUpdateSliderEffectTonemap(CCmdUI *pCmdUI);
+	afx_msg void OnSliderEffectAointensity();
+	afx_msg void OnUpdateSliderEffectAointensity(CCmdUI *pCmdUI);
+	afx_msg void OnInsertCallout();
+	afx_msg void OnExportpagePng();
+	afx_msg void OnExportpageTiff();
+};
+
+

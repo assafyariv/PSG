@@ -1,0 +1,49 @@
+
+#include "include/NVSGScene.cg"
+
+float4x4 mvp : WorldViewProjection;
+float4x4 mvi : WorldViewInverseTranspose;
+float4x4 mv  : WorldView;
+NVSGScene scene;
+
+struct VertexInput {
+  float4 position : POSITION;
+  float3 normal : NORMAL;
+  float4 texcoord : TEXCOORD0;
+};
+
+struct VertexOutput {
+  float4 position : POSITION;
+  float3 normal : TEXCOORD1;
+  float4 color  : COLOR;
+};
+
+VertexOutput vp(VertexInput input)
+{
+  VertexOutput output;
+  output.position = mul(mvp, input.position);
+  output.normal = mul((float3x3)mvi, input.normal);
+  output.color = float4(0, 1, 0, 1);
+  return output;
+}
+
+float4 fp( VertexOutput input ) : COLOR
+{
+  float red = fmod( (float)scene.frameNumber, 16.0 ) / 16.0;
+  float green = fmod( (float)scene.frameNumber, 128.0 ) / 128.0;
+  float blue = fmod( (float)scene.frameNumber, 256.0 ) / 256.0;
+
+  return float4( red, green, blue, 1 );
+}
+
+technique tek
+{
+  pass p0
+  {
+    VertexProgram = compile arbvp1 vp();
+    FragmentProgram = compile arbfp1 fp();
+    DepthTestEnable = true;
+    CullFaceEnable = false;
+  }
+}
+

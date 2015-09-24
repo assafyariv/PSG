@@ -1,0 +1,131 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+
+@{
+    ViewBag.Title = "Edit";
+    var states = new SelectList((System.Collections.IEnumerable)ViewBag.ro, "roomId", "name");
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Products</legend>
+        
+        @Html.HiddenFor(model => model.productID)
+
+                   @Html.HiddenFor(model => model.location)
+                    @Html.HiddenFor(model => model.version)
+           @Html.HiddenFor(model => model.mainPubLocation)
+           @Html.HiddenFor(model => model.htmlNum)
+          
+   
+   
+       
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.productName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productName)
+            @Html.ValidationMessageFor(model => model.productName)
+        </div>
+
+             <div class="editor-label">
+            @Html.LabelFor(model => model.productVersion)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productVersion)
+            @Html.ValidationMessageFor(model => model.productVersion)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.description)
+        </div>
+        <div class="editor-field">
+                  @Html.TextAreaFor(model => model.description, new { @class = "whatever-class", @cols = 36, @rows = 5 })
+            @Html.ValidationMessageFor(model => model.description)
+        </div>
+      
+         <div class="editor-label">
+            @Html.LabelFor(model => model.roomID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.roomID, states, new { style = "width:160px;" })  
+              @Html.ValidationMessage("name", "*") 
+         
+          
+        </div>
+      
+        @{
+         //       @Html.HiddenFor(model => model.Publications)
+          // @Html.HiddenFor(model => model.Materials)
+}
+       
+
+         <input type="file" name="file" id="file" /> 
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+
+</fieldset>
+}
+
+
+<div>
+    @Html.ActionLink("Add Publication", "CreatePUB", new { id = Model.productID })
+    @Html.ActionLink("Back to List", "Plist")
+</div>
+  
+  @{/*  
+<fieldset>
+<table>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Publications):
+
+        </th>
+
+        <th></th>
+    </tr>
+@foreach (var item in Model.Publications)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Details", "Details", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Delete", "Delete", "AVcfile", new { id = item.id }, null) |
+            @Html.ActionLink("Download", "Download", "AVcfile", new { id = item.id }, null) 
+
+        </td>
+    </tr>  
+    
+}
+</table>
+</fieldset>
+
+
+<div>
+    @Html.ActionLink("Add Publication", "CreatePUB", new { id = Model.productID })
+    @Html.ActionLink("Back to List", "Plist")
+</div>
+
+@{
+    //new { @Value = 0 }))  )
+    //     @Html.HiddenFor(Model => Model.location)
+    //   @Html.HiddenFor(Model => Model.version)
+
+    ////@Html.ActionLink("Add Publication", "Create", "AVcfile")//, new { Pid = Model.productID })
+}
+
+*/ }
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    }

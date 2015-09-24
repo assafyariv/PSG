@@ -1,0 +1,290 @@
+// Copyright NVIDIA Corporation 2002-2005
+// TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+// *AS IS* AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER EXPRESS
+// OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS
+// BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+// WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+// BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS)
+// ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF NVIDIA HAS
+// BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES 
+
+// un-tweakables
+
+#include "include/NVSGLight.cg"
+#include "include/NVSGMaterial.cg"
+#include "include/phongLightingTor.cg"
+
+float4x4 worldViewProj : WorldViewProjection; // model to clip
+float4x4 world         : World;   // model to world
+float4x4 worldIT       : WorldIT; // model to world
+float4x4 viewI         : ViewI;   // view to world 
+
+float4x4 worldViewMatrix    : WorldView;
+float4x4 worldViewMatrixI   : WorldViewI;
+float4x4 viewInverseMatrix  : ViewIT;
+float4x4 viewMatrix         : View;
+
+// gloabal ambiel term
+float4 gAmbient = {1.0,1.0,1.0,1.0} ;//: GlobalAmbient;
+
+
+float4 WoodColor = {0.0f, 0.0f, 0.0f, 1.0f};
+
+NVSGLight     light[8];
+NVSGMaterial  material;
+
+
+
+// tweakables
+
+texture normalMap : NormalMap
+<
+  string Desc        = "Normal map";
+  string File        = "../textures/default_bump_normal.dds";
+  string TextureType = "2D";
+>;
+
+float bumpHeight
+<
+  string Desc   = "Bump height";
+  string gui    = "slider";
+  float uimin   = 0.0;
+  float uimax   = 2.0;
+  float uistep  = 0.1;
+> = 0.5;
+
+sampler2D normalMapSampler = sampler_state
+{
+  Texture   = <normalMap>;
+  MinFilter = Linear;
+  MagFilter = Linear;
+};
+
+// start wood 
+float RingScale <
+    string units = "inch";
+    string gui    = "slider";
+    float uimin = 0.0;
+    float uimax = 10.0;
+    float uistep = 0.01;
+    string Desc   =  "Ring Scale";
+> = 0.46;
+
+float AmpScale <
+    string gui    = "slider";
+    float uimin = 0.01;
+    float uimax = 2.0;
+    float uistep = 0.01;
+    string Desc   = "Wobbliness";
+> = 0.7;
+
+// These attributes mean a WOODEN Log, not a Logarithm!
+//	They define the relative size of the log to the model.
+float WoodScale <
+    string gui    = "slider";
+    float uimin = 0.01;
+    float uimax = 20.0;
+    float uistep = 0.01;
+    string Desc   =  "Model Size, Relative to Wood";
+> = 8;
+
+float WoodOffsetX <
+    string gui    =  "Log-CenterX Offset";
+
+> = -10.0;
+
+float WoodOffsetY <
+    string gui    =  "Log-CenterY Offset";
+
+> =  -11.0;
+
+float WoodOffsetZ <
+    string gui    =  "Log-CenterZ Offset";
+
+> = 7.0;
+
+texture NoiseTex <
+    string ResourceName = "noiseL8_32x32x32.dds";
+    string UIName =  "Noise";
+    string ResourceType = "3D";
+>;
+
+sampler3D NoiseSamp = sampler_state {
+    Texture = <NoiseTex>;
+    MagFilter = Point;
+    MinFilter = Point;
+    WrapS = Repeat;
+    WrapS = Repeat;
+    WrapR = Repeat;
+};
+//end wood defines
+
+// structures and shaders /////////////////////
+
+struct a2v 
+{
+  float4 Position : POSITION; //in object space
+  float2 TexCoord : TEXCOORD0; // lookup normal map
+  float3 Tangent  : TEXCOORD1; //in object space
+  float3 Binormal : TEXCOORD2; //in object space
+  float3 Normal   : NORMAL; //in object space
+
+};
+
+struct v2f 
+{
+  float4 Position  : POSITION; //in projection space
+  float4 TexCoord  : TEXCOORD0;
+  float4 TexCoord1 : TEXCOORD1; //first row of the 3x3 transform from tangent to cube space
+  float3 Normal    : TEXCOORD4; //third row of the 3x3 transform from tangent to cube space
+  float3 WoodPos   : TEXCOORD5;
+};
+
+v2f BumpReflectVS(a2v     IN,
+                  uniform float4x4 WorldViewProj,
+                  uniform float4x4 World,
+			uniform float4x4 WorldIT,
+                  uniform float4x4 ViewIT)
+{
+  v2f OUT;
+
+  // Position in screen space.
+  OUT.Position = mul(WorldViewProj, IN.Position);
+  
+  // pass texture coordinates for fetching the normal map
+  OUT.TexCoord.xy = IN.TexCoord.xy * float2(3.0,3.0);
+
+  float4 worldPos = mul(World,IN.Position);
+  // compute the eye vector (going from shaded point to eye) in cube space
+  float4 eyeVector = worldPos - ViewIT[3]; // view inv. transpose contains eye position in world space in last row.
+  OUT.TexCoord1.xyz = eyeVector;
+  OUT.TexCoord1.w = 0.0;
+  OUT.Normal.xyz = mul(WorldIT, float4(IN.Normal, 1.0f)).xyz;
+  float3 WoodOffset = float3 (WoodOffsetX,WoodOffsetY,WoodOffsetZ);
+  OUT.WoodPos = (WoodScale* IN.Position.xyz) + WoodOffset; // wood grain coordinate system
+  return OUT;
+}
+
+struct f2fb
+{
+  float4 col : COLOR;
+};
+
+f2fb BumpReflectPS(v2f IN,
+                   uniform sampler2D NormalMap,
+                   uniform float BumpScale,
+ 		   uniform float4 gAmbient,
+                   uniform NVSGLight light[8],
+                   uniform NVSGMaterial material,
+		   uniform float4x4 ViewIT,
+			uniform float4x4 WorldIT) 
+{
+  float3 eyevec = IN.TexCoord1.xyz;//float3(IN.TexCoord1.w, IN.TexCoord2.w, IN.TexCoord3.w);
+  float3 P = 0;
+  P.x = eyevec.x + ViewIT[3].x;
+  P.y = eyevec.y + ViewIT[3].y;
+  P.z = eyevec.z + ViewIT[3].z;
+
+  float3 ambientSum = 0;
+  float3 diffuseSum = 0;
+  float3 specularSum = 0;
+
+// wood stuff
+
+    float3 Pwood = IN.WoodPos + (AmpScale * tex3D(NoiseSamp,IN.WoodPos.xyz/32.0).xyz);
+
+    float r = RingScale * sqrt(dot(Pwood.yz,Pwood.yz));
+    r = r + tex3D(NoiseSamp,r.xxx/32.0).x;
+    r = r - floor(r);
+    r = smoothstep(0.0, 0.8, r) - smoothstep(0.83,1.0,r);
+  //  float3 dColor = lerp(material.diffuse,float4(material.diffuse.x*0.945,material.diffuse.y*0.83,material.diffuse.z*0.72,1.0),r);
+  float3 dColor = lerp(material.diffuse,WoodColor.xyz*WoodColor.w,r);
+    float4 ddColor = float4 (dColor.xyz,1.0);
+    float Ks = lerp(0.5,0.7,r);
+
+// end wood stuff
+
+  // fetch the bump normal from the normal map
+  float3 normal = (tex2D(NormalMap, IN.TexCoord.xy).xyz - 0.5) * 2.0; // expand
+  normal = normalize(float3(normal.x * BumpScale, normal.y * BumpScale, normal.z)); 
+ //float3 wpn = mul(WorldIT, float4( normal, 1.0f)).xyz;
+ float3 N = normalize(normal);//normalize(IN.Normal.xyz) + wpn);
+
+  for ( int i=0; i<light.length; ++i )
+  {
+    float3 ambientLight;
+    float3 diffuseLight;
+    float3 specularLight;
+
+   lighting_main_bump( N,light[i], P,normalize(IN.Normal.xyz),eyevec , material.shininess,0.7, ambientLight, diffuseLight, specularLight );
+
+    // sum up
+    ambientSum += ambientLight;
+    diffuseSum += diffuseLight;
+    specularSum += specularLight;
+  }
+
+  float4 ambient = material.ambient * gAmbient * float4(ambientSum, 1);
+ // float4 diffuse = material.diffuse * float4(diffuseSum, 1);
+ float4 diffuse = ddColor * float4(diffuseSum, 1);
+
+ // float4 specular = material.specular * float4(specularSum, 1);
+ float4 specular =   Ks*material.specular * float4(specularSum, 1);
+
+  // transform the bump normal into cube space
+  // then use the transformed normal and eye vector to compute a reflection vector
+  // used to fetch the cube map
+  // (we multiply by 2 only to increase brightness)
+ // float3 eyevec = float3(IN.TexCoord1.w, IN.TexCoord2.w, IN.TexCoord3.w);  
+   //float3 lookup = reflect(eyevec, worldNorm);
+
+    f2fb OUT;
+  //OUT.col = texCUBE(EnvironmentMap, lookup);
+ 
+  OUT.col =  material.emission + ambient + diffuse + specular;
+ 
+  return OUT;
+}
+
+
+//////// techniques ////////////////////////////
+
+technique BumpReflect_NV30
+{
+  pass p0
+  {
+    DepthTestEnable = true;
+    DepthMask       = true;
+    CullFaceEnable  = false;
+
+    VertexProgram   = compile vp30 BumpReflectVS(worldViewProj,world,worldIT,viewInverseMatrix);
+    FragmentProgram = compile fp30 BumpReflectPS(normalMapSampler,bumpHeight,gAmbient, light, material,viewInverseMatrix,worldIT);
+  }
+}
+
+technique BumpReflect_NV40
+{
+  pass p0
+  {
+    DepthTestEnable = true;
+    DepthMask       = true;
+    CullFaceEnable  = false;
+
+    VertexProgram   = compile vp40 BumpReflectVS(worldViewProj,world,worldIT,viewInverseMatrix);
+    FragmentProgram = compile fp40 BumpReflectPS(normalMapSampler,bumpHeight,gAmbient, light, material,viewInverseMatrix,worldIT);
+  }
+}
+
+technique BumpReflect_ARB
+{
+  pass p0
+  {
+    DepthTestEnable = true;
+    DepthMask       = true;
+    CullFaceEnable  = false;
+
+    VertexProgram   = compile arbvp1 BumpReflectVS(worldViewProj,world,worldIT,viewInverseMatrix);
+    FragmentProgram = compile arbfp1 BumpReflectPS(normalMapSampler,bumpHeight,gAmbient, light, material,viewInverseMatrix,worldIT);
+  }
+}

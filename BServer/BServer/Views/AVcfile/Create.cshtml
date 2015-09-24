@@ -1,0 +1,93 @@
+﻿@model BServer.Models.AVCfile
+
+@{
+    ViewBag.Title = "Create";
+   var states = new SelectList((System.Collections.IEnumerable)ViewBag.ro, "roomId", "name");
+}
+
+<h2>Create Publication</h2>
+
+@using (Html.BeginForm("Create", "AVcfile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>AVCfile</legend>
+        
+        @Html.HiddenFor(model => model.productId)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.name)
+            @Html.ValidationMessageFor(model => model.name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.productVersion)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.productVersion)
+            @Html.ValidationMessageFor(model => model.productVersion)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.description)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.description, new { @class = "whatever-class", @cols = 36, @rows = 5 })
+            @Html.ValidationMessageFor(model => model.description)
+        </div>
+
+         <!--
+        <div class="editor-label">
+            @Html.LabelFor(model => model.data)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.data)
+            @Html.ValidationMessageFor(model => model.data)
+        </div>
+
+       <div class="editor-label">
+            @Html.LabelFor(model => model.productId)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.productId, new { @Value = ViewBag.PRoID })
+            @Html.ValidationMessageFor(model => model.productId)
+        </div>
+      
+            <div class="editor-label">
+            @Html.LabelFor(model => model.roomID)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.roomID, new { @Value = 0 })
+            @Html.ValidationMessageFor(model => model.roomID)
+        </div>
+          -->
+
+       
+         <div class="editor-label">
+            @Html.LabelFor(model => model.roomID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.roomID, states, new { style = "width:160px;" })   
+            @Html.ValidationMessageFor(model => model.roomID)
+        </div>
+
+         <input type="file" name="file" id="file" /> 
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+     @Html.ActionLink("Back to Edit Product", "Edit", "Products", new { id = ViewBag.PRoID }, null)
+    @Html.ActionLink("Back to List", "Plist", "Products")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

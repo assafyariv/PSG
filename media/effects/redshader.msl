@@ -1,0 +1,11 @@
+shader my_red
+{
+  output:
+   Color result;
+
+  void main()
+  {
+    result = Color(1, 0, 0, 1);
+  }
+};
+

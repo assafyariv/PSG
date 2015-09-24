@@ -1,0 +1,47 @@
+﻿<!-- COPYRIGHT (C) 2011-2013 ASSAF YARIV  !-->
+
+@model BServer.Models.Products
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ToolBar</title>
+     <style type ="text/css">
+
+			a { color:skyblue }
+			#info {
+				position: absolute;
+				top: 0px; width: 100%; height: 100%;
+				color: #fff;
+				background:rgba(0,0,0,0.65);
+				padding: 5px;
+				margin:0;
+				text-align: center;
+				z-index:1000;
+				display:block;
+				align: center; 
+			}
+
+		</style>
+         @Styles.Render("~/Content/css")
+    
+
+</head>
+<body>
+           <div id="info">
+                        <ul id="menu">
+                             <li><a href="/BServer/" target="_parent">Home</a></li>
+                            <li><a href="/BServer/Home/About" target="_parent">About</a></li>
+                            <li><a href="/BServer/Home/Contact" target="_parent">Contact</a></li>
+                            <li><a href="/BServer/Products" target="_parent">Products</a></li>
+                            <li><a href="/BServer/Products/Details/@Model.productID" target="_parent">Back to Product</a></li>
+                            <li><a onclick=parent.ddd() style="cursor:pointer">3D</a>&nbsp &nbsp </li>
+                        </ul>
+ </div>
+</body>
+</html>
+

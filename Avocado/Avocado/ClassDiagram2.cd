@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CSplashWnd" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAEAAAAAAAAAAEAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAboutDlg" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAABAAAAAAQQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Avocado.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoDocInterface" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAIAAAAAAAAAAAEAQAAAAAAAA=</HashCode>
+      <FileName>AvocadoDoc.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CElementViewMenuButton" Collapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ClassView.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CClassToolBar" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ElementView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CElementView" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACACABAgAELAAwAhAAMgAAEBiAEgAEAAAEBgEAAACA=</HashCode>
+      <FileName>ElementView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoApp" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAIAAAIAAAABEAIgABAAABQAAEAEQCIAARAAACAAA=</HashCode>
+      <FileName>Avocado.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoDoc" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wAAAAAAAEAAAAAAACgAIgAAiQSghQAQQAEABAAAAAAA=</HashCode>
+      <FileName>AvocadoDoc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoViewInterface" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAABIAAAAAAAAAQBgAAAA=</HashCode>
+      <FileName>AvocadoView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAvocadoView" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMCBICIQgYNiQCiIGIBAhANBlTQBQJRAIkhNAFgcEQA=</HashCode>
+      <FileName>AvocadoView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWebBrowserBar" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAGAAAAAAAEAAAEAAAAAAAAAACAAAMEAAAAAAAAAAAg=</HashCode>
+      <FileName>CalendarBar.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileViewToolBar" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileView" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACgCAAAiAEAACABAAAAkAAAACAEAAFAgQABAABIAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COutlookBar" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>MainFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMainFrame" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FKZ2EBZQQCxLAHw/vhF7nBEaqTHMA9IEmaQcji6qFNA=</HashCode>
+      <FileName>MainFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CServerViewToolBar" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ServerView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CServerView" Collapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AASACAAAiAEAACABAAAAwABBAKAEAEEAAQABAAAIAAA=</HashCode>
+      <FileName>ServerView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CViewTree" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAgQAAAAA=</HashCode>
+      <FileName>ViewTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHtmlEditorToolBar" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>WebView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHtmlEditor" Collapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACCACAEAyAEAACABgAAAkAAAACAEAAEAAQABAAAIAAA=</HashCode>
+      <FileName>WebView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

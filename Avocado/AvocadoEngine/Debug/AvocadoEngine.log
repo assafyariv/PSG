@@ -1,0 +1,44 @@
+﻿Build started 12/15/2013 5:09:14 PM.
+     1>Project "C:\psg\Avocado\AvocadoEngine\AvocadoEngine.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Debug\AvocadoEngine.unsuccessfulbuild".
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\SceniX\inc\nvrt\nvirt /I..\..\SceniX\inc\nvrt /I..\..\SceniX\inc\nvsg\nvtraverser /I..\..\SceniX\inc\nvsg\nvui /I..\..\Scenix\inc\ /I..\..\SceniX\inc\nvsg /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D _AVENG /D AVOCADOENGINE_EXPORTS /D _D_NVSG_DGB_LEAK_DETECTION /D _AVOCADO_DISABLE_TRACING /D _WINDLL /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /wd4996 /analyze- /errorReport:prompt AvocadoMaterials.cpp
+         AvocadoMaterials.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\psg\Avocado\Debug\AvocadoEngine.dll" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib opengl32.lib wininet.lib ..\..\Scenix\lib\x86\win\crt100\debug\Scenix9.lib ..\..\Scenix\lib\x86\win\crt100\debug\SceniXRT9.lib ..\..\Scenix\lib\x86\win\crt100\debug\cg.lib ..\..\Scenix\lib\x86\win\crt100\debug\cgGL.lib "..\..\3rdParty\jpeg-8d\JpegLibWin\Debug\JpegLibWin.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\AvocadoEngine.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\psg\Avocado\Debug\AvocadoEngine.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\psg\Avocado\Debug\AvocadoEngine.lib" /MACHINE:X86 /DLL Debug\AnimationManipulator.obj
+         Debug\AvocadoAnimationManipulatorModule.obj
+         Debug\AvocadoAnnotationsModule.obj
+         Debug\AvocadoAppInterface.obj
+         Debug\AvocadoDraggerModule.obj
+         Debug\AvocadoEngine.obj
+         Debug\AvocadoEngineDoc.obj
+         Debug\AvocadoEngineOptions.obj
+         Debug\AvocadoMaterials.obj
+         Debug\AvocadoNetworkModule.obj
+         Debug\AvocadoEngineObject.obj
+         Debug\AvocadoEngineView.obj
+         Debug\AvocadoImportModule.obj
+         Debug\AvocadoManipulator.obj
+         Debug\AvocadoManipulatorModule.obj
+         Debug\AvocadoMessageHandler.obj
+         Debug\AvocadoParams.obj
+         Debug\AvocadoPickerModule.obj
+         Debug\AvocadoPipeline.obj
+         Debug\AvocadoPipelineModule.obj
+         Debug\AvocadoScenixAdapter.obj
+         Debug\AvocadoSelectionModule.obj
+         Debug\AvocadoSOAPClient.obj
+         Debug\CameraAnimator.obj
+         Debug\FFPToCgFxTraverser.obj
+         Debug\Manipulator.obj
+         Debug\MeshGenerator.obj
+         Debug\SceneFunctions.obj
+         Debug\unzip.obj
+         Debug\zip.obj
+     1>LINK : fatal error LNK1104: cannot open file '..\..\3rdParty\jpeg-8d\JpegLibWin\Debug\JpegLibWin.lib'
+     1>Done Building Project "C:\psg\Avocado\AvocadoEngine\AvocadoEngine.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:02.85

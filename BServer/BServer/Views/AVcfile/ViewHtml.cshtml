@@ -1,0 +1,36 @@
+﻿@model BServer.Models.AVCfile
+
+
+@{
+    int HtmlNumber = Model.htmlNum;
+    string url = "/BServer/BServer" + Model.location + "/view0" + ".html";
+}
+
+    <iframe id="chgMe" src="@Url.Content(url)" scrolling="no"
+    width="250" height="150" frameborder="0" style="float: right; margin-left: 1em;">
+    </iframe>
+     <ul id="menu">
+       <li><button onclick= PreviousHtml()>Previous</button></li> 
+       <li><button onclick= nextHtml()>Next</button> </li> 
+   </ul>
+
+   <script type="text/javascript">
+
+       var HtmlNum = @Model.htmlNum;
+       var index = 0;
+
+       function nextHtml()
+       {
+         index = (index+1)%HtmlNum;
+         var myurl =  "/BServer/BServer" + '@Model.location' + "/view" +Math.abs(index)+ ".html";
+         document.getElementById('chgMe').src=myurl;
+       }
+
+       function PreviousHtml()
+       {
+         index = (index-1)%HtmlNum;
+         var myurl =  "/BServer/BServer" + '@Model.location' + "/view" +Math.abs(index)+ ".html";
+         document.getElementById('chgMe').src=myurl;
+       }
+   
+   </script>

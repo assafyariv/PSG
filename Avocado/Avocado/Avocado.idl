@@ -1,0 +1,35 @@
+// SDISample.idl : type library source for SDISample.exe
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (SDISample.tlb).
+
+[ uuid(207B9E5E-4DF4-405B-A521-30614A804E8E), version(1.0) ]
+library IAvocado
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for CSDISampleDoc
+	
+	[ uuid(F1BE1303-1859-46CA-A6C9-8A1E6E813223) ]
+	dispinterface IAvocado
+	{
+		properties:
+			[id(1)] long DocumentID;
+		methods:
+       //     [id(1)] boolean ImportFile(BSTR szFileName);
+		    [id(2)] boolean AvocadoInvokeDoc( BSTR szMessage, long lVID, BSTR  szParams,BSTR  szTargetModule);
+		    [id(3)] boolean AvocadoInvokeView(BSTR szMessage, long lVID, BSTR szParams,boolean bToAllModules);
+			[id(4)] boolean AvocadoInvokeUI(long szMessage, long lVID, long posX,long posY,long nFlags);
+			[id(5)] boolean AvocadoResizeView(long lVID, long posX,long posY);
+			[id(6)] long AvocadoCreateView(long hWnd, long viewInterface);
+	}; 
+
+	//  Class information for CSDISampleDoc
+	
+	[ uuid(DA96493C-33A3-4D50-91A5-41DFF6287FBF) ]
+	coclass CAvocadoDoc
+	{
+		[default] dispinterface IAvocado;
+	};
+};
